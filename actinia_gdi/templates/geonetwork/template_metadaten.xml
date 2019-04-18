@@ -51,7 +51,7 @@
          <gmd:citation>
             <gmd:CI_Citation>
                <gmd:title>
-                  <gco:CharacterString>{{ title}}</gco:CharacterString>
+                  <gco:CharacterString>{{ title }}</gco:CharacterString>
                </gmd:title>
                <gmd:date>
                   <gmd:CI_Date>
@@ -75,17 +75,17 @@
          <gmd:pointOfContact>
             <gmd:CI_ResponsibleParty>
                <gmd:individualName>
-                  <gco:CharacterString>T. Adams</gco:CharacterString>
+                  <gco:CharacterString>mundialis</gco:CharacterString>
                </gmd:individualName>
                <gmd:organisationName>
-                  <gco:CharacterString>mundialisT</gco:CharacterString>
+                  <gco:CharacterString>mundialis</gco:CharacterString>
                </gmd:organisationName>
                <gmd:contactInfo>
                   <gmd:CI_Contact>
                      <gmd:address>
                         <gmd:CI_Address>
                            <gmd:electronicMailAddress>
-                              <gco:CharacterString>adams@mundialis.de</gco:CharacterString>
+                              <gco:CharacterString>info@mundialis.de</gco:CharacterString>
                            </gmd:electronicMailAddress>
                         </gmd:CI_Address>
                      </gmd:address>

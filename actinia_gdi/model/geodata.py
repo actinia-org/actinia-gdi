@@ -36,3 +36,4 @@ class GeodataMeta(models.Base):
     bbox = fields.ListField([int, float])  # bbox array
     crs = fields.StringField()  # string
     table = fields.StringField()  # string
+    format = fields.StringField()  # string

@@ -25,6 +25,7 @@ __license__ = "Apache-2.0"
 
 
 import json
+from datetime import datetime
 
 from flask import make_response, jsonify
 from flask_restful import Resource
@@ -33,9 +34,11 @@ from flask_restful_swagger_2 import swagger
 from actinia_gdi.apidocs import metadata
 from actinia_gdi.api.common import checkConnection
 from actinia_gdi.model.responseModels import SimpleResponseModel
-from actinia_gdi.core.gnos import getRecordsByCategory
-from actinia_gdi.core.gnos import getRecordByUUID, getRecordsByTags
-from actinia_gdi.core.gnos import getMetaByUUID, getMetaByTags
+from actinia_gdi.core.gnosReader import getRecordsByCategory
+from actinia_gdi.core.gnosReader import getRecordByUUID, getRecordsByTags
+from actinia_gdi.core.gnosReader import getMetaByUUID, getMetaByTags
+from actinia_gdi.core.gnosParser import makeItJson
+from actinia_gdi.core.gnosWriter import update
 from actinia_gdi.resources.logging import log
 
 
@@ -64,7 +67,8 @@ class RawTags(Resource):
     @swagger.doc(metadata.rawTags_get_docs)
     def get(self, tags):
         try:
-            records = getRecordsByTags(tags)
+            gnosresp = getRecordsByTags(tags)
+            records = makeItJson(gnosresp)
 
             res = make_response(records, 200)
             res.headers['Content-Type'] = 'application/json'
@@ -87,7 +91,8 @@ class RawCat(Resource):
     @swagger.doc(metadata.rawCategory_get_docs)
     def get(self, category):
         try:
-            records = getRecordsByCategory(category)
+            gnosresp = getRecordsByCategory(category)
+            records = makeItJson(gnosresp)
 
             res = make_response(records, 200)
             res.headers['Content-Type'] = 'application/json'
@@ -114,7 +119,8 @@ class RawUuid(Resource):
     @swagger.doc(metadata.rawUuid_get_docs)
     def get(self, uuid):
         try:
-            record = getRecordByUUID(uuid)
+            gnosresp = getRecordByUUID(uuid)
+            record = makeItJson(gnosresp)
             # 47e7d99e-b227-4f80-8f4c-8ff1b5016c27
 
             res = make_response(record, 200)
@@ -168,6 +174,34 @@ class Uuid(Resource):
             res.headers['Content-Type'] = 'application/json'
             return res
         except Exception:
+            res = (jsonify(SimpleResponseModel(
+                        status=404,
+                        message='Error looking for uuid "' + uuid + '".'
+                   )))
+            return make_response(res, 404)
+
+
+class UpdateUuid(Resource):
+    """ Definition for endpoint @app.route('/metadata/update/uuids/<uuid>')
+    TODO: not use in production environment
+
+    Contains HTTP GET endpoint
+    Contains swagger documentation
+    """
+
+    # @swagger.doc(metadata.uuid_get_docs)
+    def get(self, uuid):
+
+        try:
+            utcnow = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+            gnosresp = update(uuid, utcnow)
+            if gnosresp is None:
+                raise Exception
+            res = make_response(gnosresp.content, 200)
+            return res
+        except Exception as e:
+            log.error('error parsing gnos response')
+            log.error(e)
             res = (jsonify(SimpleResponseModel(
                         status=404,
                         message='Error looking for uuid "' + uuid + '".'
