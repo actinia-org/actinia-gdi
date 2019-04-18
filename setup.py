@@ -33,7 +33,8 @@ from setuptools import setup
 entry_points = {
   'console_scripts': [
     'name = actinia_gdi.resources.cli:name',
-    'about = actinia_gdi.resources.cli:about'
+    'about = actinia_gdi.resources.cli:about',
+    'pc2grass = actinia_gdi.resources.cli:pc2grass'
   ]
 }
 
