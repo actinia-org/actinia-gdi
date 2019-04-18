@@ -1,0 +1,3 @@
+FROM centos/python-35-centos7
+
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.0.1

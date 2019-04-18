@@ -1,0 +1,15 @@
+colorlog==3.1.4
+Flask==0.12.2
+Flask-Cors==3.0.3
+Flask-RESTful==0.3.6
+flask-restful-swagger-2==0.35
+gunicorn==19.7.1
+jsonmodels==2.3
+peewee==3.2.2
+pip==18.0.0
+psycopg2-binary==2.7.4
+requests==2.19.1
+setuptools==39.0.1
+xmltodict==0.11.0
+pyscaffold==3.0.3
+pytest-cov==2.5.1

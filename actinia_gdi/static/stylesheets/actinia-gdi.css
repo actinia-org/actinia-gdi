@@ -1,0 +1,12 @@
+/* <link rel="stylesheet" href="stylesheets/actinia-gdi.css" /> */
+
+#spectacle article h1.doc-title {
+    color: #97BF0D;
+}
+#spectacle #sidebar {
+  background-color: #97BF0D;
+}
+#spectacle #sidebar h5 {
+  color: #000000;
+}
+
