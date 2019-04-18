@@ -1,0 +1,22 @@
+version: "3"
+services:
+
+  postgis:
+    image: mdillon/postgis:9.6-alpine
+    ports:
+      - 5555:5432
+    environment:
+      POSTGRES_USER: actinia
+      POSTGRES_PASSWORD: actinia
+    volumes:
+      - ./postgresql_init_data:/docker-entrypoint-initdb.d
+      - ./postgresql_data:/var/lib/postgresql/data:Z
+
+  actinia-gdi:
+    image: actinia-gdi
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+    depends_on:
+      - postgis
