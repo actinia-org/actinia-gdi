@@ -1,0 +1,10 @@
+{
+    "list": [
+        {
+            "id": "sleep_1",
+            "exe": "sleep",
+            "params": ["60"]
+        }
+    ],
+    "version": "1"
+}

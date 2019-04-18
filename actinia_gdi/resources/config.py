@@ -40,6 +40,20 @@ class APP:
     """Default config for app and api doc
     """
     version = '0.0.0'
+    url = 'http://localhost:8080'
+
+
+class JOBTABLE:
+    """Default config for database connection for jobtabelle
+    """
+    host = 'localhost'
+    port = '5432'
+    database = 'gis'
+    user = 'gis'
+    pw = 'gis'
+    schema = 'actinia'
+    table = 'tab_jobs'
+    id_field = 'idpk_jobs'
 
 
 class GEONETWORK:
@@ -61,6 +75,26 @@ class LOGCONFIG:
     """
     logfile = 'actinia-gdi.log'
     level = 'DEBUG'
+
+
+class ACTINIACORE:
+    """Default config for actinia_core
+    """
+    url = 'http://localhost:1236/api/v1/'
+    user = 'actinia'
+    filestorage = ''
+    password = 'actinia'
+    esa_apihub_user = 'changeme'
+    esa_apihub_pw = 'changeme'
+
+
+class GISTABLE:
+    """Default config for database connection for geodata database
+    """
+    host = 'localhost'
+    port = '5432'
+    database = 'gis'
+    user = 'gis'
 
 
 class FILEUPLOAD:
@@ -93,6 +127,27 @@ class Configfile:
         if config.has_section("APP"):
             if config.has_option("APP", "version"):
                 APP.version = config.get("APP", "version")
+            if config.has_option("APP", "url"):
+                APP.url = config.get("APP", "url")
+
+        # JOBTABLE
+        if config.has_section("JOBTABLE"):
+            if config.has_option("JOBTABLE", "host"):
+                JOBTABLE.host = config.get("JOBTABLE", "host")
+            if config.has_option("JOBTABLE", "port"):
+                JOBTABLE.port = config.get("JOBTABLE", "port")
+            if config.has_option("JOBTABLE", "database"):
+                JOBTABLE.database = config.get("JOBTABLE", "database")
+            if config.has_option("JOBTABLE", "user"):
+                JOBTABLE.user = config.get("JOBTABLE", "user")
+            if config.has_option("JOBTABLE", "pw"):
+                JOBTABLE.pw = config.get("JOBTABLE", "pw")
+            if config.has_option("JOBTABLE", "schema"):
+                JOBTABLE.schema = config.get("JOBTABLE", "schema")
+            if config.has_option("JOBTABLE", "table"):
+                JOBTABLE.table = config.get("JOBTABLE", "table")
+            if config.has_option("JOBTABLE", "id_field"):
+                JOBTABLE.id_field = config.get("JOBTABLE", "id_field")
 
         # GEONETWORK
         if config.has_section("GEONETWORK"):
@@ -144,8 +199,33 @@ class Configfile:
             if config.has_option("LOGCONFIG", "level"):
                 LOGCONFIG.level = config.get("LOGCONFIG", "level")
 
+        # ACTINIACORE
+        if config.has_section("ACTINIACORE"):
+            if config.has_option("ACTINIACORE", "url"):
+                ACTINIACORE.url = config.get("ACTINIACORE", "url")
+            if config.has_option("ACTINIACORE", "user"):
+                ACTINIACORE.user = config.get("ACTINIACORE", "user")
+            if config.has_option("ACTINIACORE", "filestorage"):
+                ACTINIACORE.filestorage = config.get("ACTINIACORE", "filestorage")
+            if config.has_option("ACTINIACORE", "password"):
+                ACTINIACORE.password = config.get("ACTINIACORE", "password")
+            if config.has_option("ACTINIACORE", "esa_apihub_user"):
+                ACTINIACORE.esa_apihub_user = config.get("ACTINIACORE", "esa_apihub_user")
+            if config.has_option("ACTINIACORE", "esa_apihub_pw"):
+                ACTINIACORE.esa_apihub_pw = config.get("ACTINIACORE", "esa_apihub_pw")
 
-        # [FILEUPLOAD]
+        # GISTABLE
+        if config.has_section("GISTABLE"):
+            if config.has_option("GISTABLE", "host"):
+                GISTABLE.host = config.get("GISTABLE", "host")
+            if config.has_option("GISTABLE", "port"):
+                GISTABLE.port = config.get("GISTABLE", "port")
+            if config.has_option("GISTABLE", "database"):
+                GISTABLE.database = config.get("GISTABLE", "database")
+            if config.has_option("GISTABLE", "user"):
+                GISTABLE.user = config.get("GISTABLE", "user")
+
+        # FILEUPLOAD
         if config.has_section("FILEUPLOAD"):
             if config.has_option("FILEUPLOAD", "geodata"):
                 FILEUPLOAD.geodata = config.get("FILEUPLOAD", "geodata")

@@ -1,0 +1,183 @@
+{
+    "list": [
+        {
+            "id": "v_external_1",
+            "module": "v.external",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "{{ feat_connection }}"
+                },
+                {
+                    "param": "layer",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "output",
+                    "value": "{{ feat_table }}"
+                }
+            ],
+            "flags": "o"
+        },
+        {
+            "id": "g_region_1",
+            "module": "g.region",
+            "flags": "g"
+        },
+        {
+            "id": "g_region_1",
+            "module": "g.region",
+            "inputs": [
+                {
+                    "param": "vector",
+                    "value": "{{ feat_table }}"
+                }
+            ],
+            "flags": "g"
+        },
+        {
+            "id": "v_info_1",
+            "module": "v.info",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                }
+            ],
+            "flags": "g"
+        },
+        {
+            "id": "v_external_2",
+            "module": "v.external",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "{{ input_connection }}"
+                },
+                {
+                    "param": "layer",
+                    "value": "{{ input_table }}"
+                },
+                {
+                    "param": "output",
+                    "value": "{{ input_table }}"
+                }
+            ],
+            "flags": "o"
+        },
+        {
+            "id": "v_db_update_1",
+            "module": "v.db.update",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "column",
+                    "value": "{{ feat_int_column }}"
+                },
+                {
+                    "param": "query_column",
+                    "value": "null"
+                }
+            ]
+        },
+        {
+            "id": "v_db_update_2",
+            "module": "v.db.update",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "column",
+                    "value": "{{ feat_txt_column }}"
+                },
+                {
+                    "param": "query_column",
+                    "value": "null"
+                }
+            ]
+        },
+        {
+            "id": "v_what_vect_1",
+            "module": "v.what.vect",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "column",
+                    "value": "{{ feat_int_column }}"
+                },
+                {
+                    "param": "query_map",
+                    "value": "{{ input_table }}"
+                },
+                {
+                    "param": "query_column",
+                    "value": "{{ feat_int_column }}"
+                }
+            ]
+        },
+        {
+            "id": "v_what_vect_2",
+            "module": "v.what.vect",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "column",
+                    "value": "{{ feat_txt_column }}"
+                },
+                {
+                    "param": "query_map",
+                    "value": "{{ input_table }}"
+                },
+                {
+                    "param": "query_column",
+                    "value": "{{ feat_txt_column }}"
+                }
+            ]
+        },
+        {
+            "id": "v_db_update_5",
+            "module": "v.db.update",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                },
+                {
+                    "param": "column",
+                    "value": "{{ result_column }}"
+                },
+                {
+                    "param": "query_column",
+                    "value": "{{ result_input_column }}"
+                }
+            ]
+        },
+        {
+            "id": "v_db_select_1",
+            "module": "v.db.select",
+            "inputs": [
+                {
+                    "param": "map",
+                    "value": "{{ feat_table }}"
+                }
+            ],
+            "stdout": {"id": "{{ feat_table }}", "format": "table", "delimiter": "\n"}
+        }
+    ],
+    "webhooks": {
+        "finished": "{{ webhookUrl }}",
+        "update": "{{ webhookUrl }}"
+    },
+    "version": "1"
+}

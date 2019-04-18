@@ -1,0 +1,23 @@
+{
+    "list": [
+        {
+            "id": "loop",
+            "module": "g.info",
+            "inputs": [
+                {% for i in inputs %}
+                {
+                    "param": "{{ i.param }}",
+                    "value": "{{ i.value }}"
+                },
+                {% endfor %}
+            ],
+            "flags": "{{ flag }}",
+            "stdout": {"id": "log", "format": "list", "delimiter": ""}
+        }
+    ],
+    "webhooks": {
+         "finished": "{{ webhookUrl }}",
+         "update": "{{ webhookUrl }}"
+    },
+    "version": "1"
+}

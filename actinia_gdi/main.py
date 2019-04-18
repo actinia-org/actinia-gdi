@@ -29,6 +29,7 @@ from flask_cors import CORS
 from flask_restful_swagger_2 import Api
 
 from actinia_gdi import endpoints
+from actinia_gdi.core.jobtable import initJobDB
 from actinia_gdi.resources.logging import log, MyRequestHandler
 from actinia_gdi.resources.config import APP
 
@@ -51,6 +52,7 @@ apidoc = Api(
 )
 
 endpoints.addEndpoints(app, apidoc)
+initJobDB()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,46 @@
+{
+    "list": [
+        {
+            "id": "download",
+            "exe": "sentinelsat",
+            "params": [
+                "-u", "{{ user }}",
+                "-p", "{{ pw }}",
+                "--name", "{{ S1A_name }}",
+                "-d",
+                "--path", "{{ raw_path }}"
+            ]
+        },
+        {
+            "id": "Orbit",
+            "module": "r.s1.grd.orb",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "{{ raw_path }}/{{ S1A_name }}.zip"
+                },
+                {
+                    "param": "orbittype",
+                    "value": "Sentinel Precise (Auto Download)"
+                },
+                {
+                    "param": "continueonfail",
+                    "value": "True"
+                },
+                {
+                    "param": "polydegree",
+                    "value": "3"
+                },
+                {
+                    "param": "output",
+                    "value": "{{ preprocessing_path }}/{{ S1A_name }}_orb.dim"
+                }
+            ]
+        }
+    ],
+    "webhooks": {
+        "finished": "{{ webhookUrl }}",
+        "update": "{{ webhookUrl }}"
+    },
+    "version": "1"
+}

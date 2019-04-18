@@ -1,0 +1,25 @@
+{
+    "list": [
+        {
+            "id": "g_gisenv_1",
+            "module": "g.gisenv",
+            "inputs": [
+                {
+                    "param": "set",
+                    "value": "DEBUG=1"
+                }
+            ]
+        },
+        {
+            "id": "g_gisenv_1",
+            "module": "g.gisenv",
+            "inputs": [
+                {
+                    "param": "set",
+                    "value": "DEBUG=0"
+                }
+            ]
+        }
+    ],
+    "version": "1"
+}

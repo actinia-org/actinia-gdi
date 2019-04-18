@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>actinia-gdi</title>
+    <meta name="ROBOTS" content="NOINDEX, NOFOLLOW"/>
+</head>
+<body>
+    <h1>actinia GDI</h1>
+    <p>{{ resource }}</p>
+    <ul>
+    {% for job in jobs %}
+        <li><a href="{{ url }}/{{ job }}">{{ job }}</a></li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

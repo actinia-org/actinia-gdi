@@ -1,0 +1,89 @@
+{
+    "list": [
+        {
+            "module": "g.region",
+            "id": "g_region_1",
+            "inputs": [
+                {
+                    "param": "n",
+                    "value": "50.5"
+                },
+                {
+                    "param": "s",
+                    "value": "50"
+                },
+                {
+                    "param": "e",
+                    "value": "7"
+                },
+                {
+                    "param": "w",
+                    "value": "6.5"
+                },
+                {
+                    "param": "res",
+                    "value": "10"
+                }
+            ],
+            "flags": "pa"
+        },
+        {
+            "id": "r_surf_random_1",
+            "module": "r.surf.random",
+            "inputs": [
+                {
+                    "param": "min",
+                    "value": "3"
+                },
+                {
+                    "param": "max",
+                    "value": "3"
+                }
+            ],
+            "outputs": [
+                {
+                    "param": "output",
+                    "value": "random"
+                }
+            ],
+            "flags": "i"
+        },
+        {
+            "module": "r.info",
+            "id": "r_info_1",
+            "inputs": [
+              {
+                  "param": "map",
+                  "value": "random"
+              },
+            ],
+            "flags": "r"
+        },
+        {
+             "id": "r_what_1",
+             "module": "r.what",
+             "verbose": "true",
+             "flags": "nfic",
+             "inputs": [
+                 {
+                     "param": "map",
+                     "value": "random"
+                 },
+                 {
+                     "param": "coordinates",
+                     "value": "6.8,50.2"
+                 },
+                 {
+                     "param": "null_value",
+                     "value": "null"
+                 },
+                 {
+                     "param": "separator",
+                     "value": "comma"
+                 }
+             ],
+             "stdout": {"id": "info", "format": "table", "delimiter": "|"}
+       }
+    ],
+    "version": "1"
+}

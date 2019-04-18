@@ -1,0 +1,14 @@
+{
+    "list": [
+        {
+            "id": "1",
+            "exe": "/bin/sleep",
+            "params": ["60"]
+        }
+    ],
+    "webhooks": {
+         "finished": "{{ webhookUrl }}",
+         "update": "{{ webhookUrl }}"
+    },
+    "version": "1"
+}

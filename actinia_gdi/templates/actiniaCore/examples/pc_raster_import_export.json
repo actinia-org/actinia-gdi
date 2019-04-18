@@ -1,0 +1,48 @@
+{
+    "list": [
+        {
+            "id": "importer_1",
+            "module": "r.in.gdal",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "/mnt/geodata/export_test.tif"
+                },
+                {
+                    "param": "output",
+                    "value": "test_raster"
+                }
+            ]
+        },
+        {
+            "id": "g_region_1",
+            "module": "g.region",
+            "inputs": [
+                {
+                    "param": "raster",
+                    "value": "test_raster"
+                }
+            ],
+            "flags": "g"
+        },
+        {
+            "module": "r.out.gdal",
+            "id": "export_1",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "test_raster"
+                },
+                {
+                    "param": "format",
+                    "value": "GTiff"
+                },
+                {
+                    "param": "output",
+                    "value": "/mnt/geodata/export_test_2.tif"
+                }
+            ]
+        }
+    ],
+    "version": "1"
+}

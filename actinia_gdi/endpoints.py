@@ -37,7 +37,22 @@ from actinia_gdi.api.metadata import RawUuid
 from actinia_gdi.api.metadata import Tags
 from actinia_gdi.api.metadata import Uuid
 
+from actinia_gdi.api.processes.test import ActiniaCoreConnection
+from actinia_gdi.api.processes.test import JobTestWrapper
+from actinia_gdi.api.processes.test import JobHtmlTestWrapper
+from actinia_gdi.api.processes.test import JobIdTestWrapper
 
+from actinia_gdi.api.processes.loop import JobLoopWrapper
+from actinia_gdi.api.processes.loop import JobHtmlLoopWrapper
+from actinia_gdi.api.processes.loop import JobIdLoopWrapper
+from actinia_gdi.api.processes.loop import JobIdCancelLoopWrapper
+
+from actinia_gdi.api.processes.sentinel1 import JobS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobHtmlS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobIdS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobIdCancelS1Wrapper
+
+from actinia_gdi.api.resources import Update
 
 def addEndpoints(app, apidoc):
     @app.route('/')
@@ -63,3 +78,77 @@ def addEndpoints(app, apidoc):
     apidoc.add_resource(RawUuid,    '/metadata/raw/uuids/<uuid>')
     apidoc.add_resource(Tags,        '/metadata/geodata/tags/<tags>')
     apidoc.add_resource(Uuid,       '/metadata/geodata/uuids/<uuid>')
+
+
+    ###### TEST actiniaCore
+    # GET / POST
+    apidoc.add_resource(ActiniaCoreConnection, '/processes/test/connection')
+    # GET: list / POST: start job without writing into jobdb
+    apidoc.add_resource(
+        JobTestWrapper,
+        '/processes/test/jobs'
+    )
+    # GET: list
+    apidoc.add_resource(
+        JobHtmlTestWrapper,
+        '/processes/test/jobs.html'
+    )
+    # GET: read
+    apidoc.add_resource(
+        JobIdTestWrapper,
+        '/processes/test/jobs/<jobid>'
+    )
+
+    ###### Loop
+    # GET: list / POST: create (start job)
+    apidoc.add_resource(
+        JobLoopWrapper,
+        '/processes/loop/jobs'
+    )
+    # GET: list
+    apidoc.add_resource(
+        JobHtmlLoopWrapper,
+        '/processes/loop/jobs.html'
+    )
+    # GET: read
+    apidoc.add_resource(
+        JobIdLoopWrapper,
+        '/processes/loop/jobs/<jobid>'
+    )
+    # POST: cancel
+    apidoc.add_resource(
+        JobIdCancelLoopWrapper,
+        '/processes/loop/jobs/<jobid>/operations/cancel'
+    )
+
+    ###### sentinel1 actiniaCore
+    # GET: list / POST: create (start job)
+    apidoc.add_resource(
+        JobS1Wrapper,
+        '/processes/sentinel1/jobs'
+    )
+    # GET: list
+    apidoc.add_resource(
+        JobHtmlS1Wrapper,
+        '/processes/sentinel1/jobs.html'
+    )
+    # GET: read
+    apidoc.add_resource(
+        JobIdS1Wrapper,
+        '/processes/sentinel1/jobs/<jobid>'
+    )
+    # POST: cancel
+    apidoc.add_resource(
+        JobIdCancelS1Wrapper,
+        '/processes/sentinel1/jobs/<jobid>/operations/cancel'
+    )
+
+    ##### WEBHOOK FROM ACTINIA-CORE
+    # POST: trigger status update
+    apidoc.add_resource(
+    Update,
+    '/resources/processes/operations/update'
+    )
+
+    # apidoc.add_resource(Actinia, '/actinia/<path:actinia_path>')
+    # allows "/" inside variable

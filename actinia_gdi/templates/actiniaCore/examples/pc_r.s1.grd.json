@@ -1,0 +1,26 @@
+{
+    "list": [
+        {
+            "id": "dummy",
+            "module": "r.in.gdal",
+            "inputs": [
+                {
+                    "param": "input",
+                    "value": "/mnt/geodata/sentinel1/preprocessing/S1B_IW_GRDH_1SDV_20181029T165756_20181029T165821_013370_018BA0_9981_orb_tnc_rc.dim"
+                }
+            ],
+            "outputs": [
+                {
+                    "param": "output",
+                    "value": "S1B_IW_GRDH_1SDV_20181029T165756_20181029T165821_013370_018BA0_9981_orb_tnc_rc",
+                    "export": {
+                        "format": "GTiff",
+                        "type": "raster"
+                    }
+                }
+            ],
+            "flags": "l"
+        }
+    ],
+    "version": "1"
+}

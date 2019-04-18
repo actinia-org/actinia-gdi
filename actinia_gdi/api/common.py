@@ -28,6 +28,7 @@ from flask import make_response, jsonify
 
 from actinia_gdi.model.responseModels import SimpleResponseModel
 from actinia_gdi.core import common
+from actinia_gdi.resources.config import ACTINIACORE
 from actinia_gdi.resources.config import GEONETWORK
 from actinia_gdi.resources.logging import log
 
