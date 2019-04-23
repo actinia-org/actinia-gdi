@@ -20,3 +20,5 @@ services:
       - 5000
     depends_on:
       - postgis
+    volumes:
+      - ./actinia-gdi-data:/opt/app-root/src/config/mount

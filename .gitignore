@@ -47,3 +47,7 @@ config/mount/config.ini
 config/mount/pw.ini
 config/actinia-gdi.cfg
 docker/redis_data/dump.rdb
+docker/actinia-core-data/grassdb
+docker/actinia-core-data/resources
+docker/actinia-core-data/userdata
+docker/actinia-core-data/workspace
