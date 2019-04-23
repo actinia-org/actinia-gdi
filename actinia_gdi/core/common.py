@@ -78,3 +78,18 @@ def checkConnection(url, name, expectedFormat):
     except Exception:
         log.error('Connection Error to ' + name)
         return None
+
+
+def start_job(timeout, func, *args):
+    """Execute the provided function in a subprocess
+    Args:
+        func: The function to call from the subprocess
+        *args: The function arguments
+    Returns:
+    """
+    # Just starting the process
+    from multiprocessing import Process
+    p = Process(target=func, args=args)
+    p.start()
+
+    return
