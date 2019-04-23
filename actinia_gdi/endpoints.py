@@ -37,24 +37,59 @@ from actinia_gdi.api.metadata import RawUuid
 from actinia_gdi.api.metadata import Tags
 from actinia_gdi.api.metadata import Uuid
 
-from actinia_gdi.api.processes.test import ActiniaCoreConnection
-from actinia_gdi.api.processes.test import JobTestWrapper
-from actinia_gdi.api.processes.test import JobHtmlTestWrapper
-from actinia_gdi.api.processes.test import JobIdTestWrapper
 
-from actinia_gdi.api.processes.loop import JobLoopWrapper
-from actinia_gdi.api.processes.loop import JobHtmlLoopWrapper
-from actinia_gdi.api.processes.loop import JobIdLoopWrapper
-from actinia_gdi.api.processes.loop import JobIdCancelLoopWrapper
+# endpoints loaded if run as actinia-core plugin
+def create_endpoints(flask_api):
 
-from actinia_gdi.api.processes.sentinel1 import JobS1Wrapper
-from actinia_gdi.api.processes.sentinel1 import JobHtmlS1Wrapper
-from actinia_gdi.api.processes.sentinel1 import JobIdS1Wrapper
-from actinia_gdi.api.processes.sentinel1 import JobIdCancelS1Wrapper
+    app = flask_api.app
+    apidoc = flask_api
 
-from actinia_gdi.api.resources import Update
+    @app.route('/')
+    def index():
+        try:
+            return current_app.send_static_file('index.html')
+        except werkzeug.exceptions.NotFound:
+            log.debug('No index.html found in static folder. Serving backup.')
+            return ("""<h1 style='color:red'>actinia GDI</h1>
+                <a href="latest/api/swagger.json">API docs</a>""")
 
+    @app.route('/<path:filename>')
+    def static_content(filename):
+        # WARNING: all content from folder "static" will be accessible!
+        return send_from_directory(app.static_folder, filename)
+
+    apidoc.add_resource(Upload, '/files')
+
+    apidoc.add_resource(GnosConnection, '/metadata/test/connection')
+
+    apidoc.add_resource(RawTags, '/metadata/raw/tags/<tags>')
+    apidoc.add_resource(RawCat, '/metadata/raw/categories/<category>')
+    apidoc.add_resource(RawUuid, '/metadata/raw/uuids/<uuid>')
+    apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
+    apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
+
+
+# endpoints loaded if run as standalone app
 def addEndpoints(app, apidoc):
+
+    # import all classes that are only needed for standalone run
+    from actinia_gdi.api.processes.test import ActiniaCoreConnection
+    from actinia_gdi.api.processes.test import JobTestWrapper
+    from actinia_gdi.api.processes.test import JobHtmlTestWrapper
+    from actinia_gdi.api.processes.test import JobIdTestWrapper
+
+    from actinia_gdi.api.processes.loop import JobLoopWrapper
+    from actinia_gdi.api.processes.loop import JobHtmlLoopWrapper
+    from actinia_gdi.api.processes.loop import JobIdLoopWrapper
+    from actinia_gdi.api.processes.loop import JobIdCancelLoopWrapper
+
+    from actinia_gdi.api.processes.sentinel1 import JobS1Wrapper
+    from actinia_gdi.api.processes.sentinel1 import JobHtmlS1Wrapper
+    from actinia_gdi.api.processes.sentinel1 import JobIdS1Wrapper
+    from actinia_gdi.api.processes.sentinel1 import JobIdCancelS1Wrapper
+
+    from actinia_gdi.api.resources import Update
+
     @app.route('/')
     def index():
         try:
@@ -65,7 +100,7 @@ def addEndpoints(app, apidoc):
                 <a href="latest/api/swagger.json">API docs</a>""")
 
     @app.route('/<path:filename>')
-    def staticContent(filename):
+    def static_content(filename):
         # WARNING: all content from folder "static" will be accessible!
         return send_from_directory(app.static_folder, filename)
 
@@ -73,14 +108,13 @@ def addEndpoints(app, apidoc):
 
     apidoc.add_resource(GnosConnection, '/metadata/test/connection')
 
-    apidoc.add_resource(RawTags,     '/metadata/raw/tags/<tags>')
-    apidoc.add_resource(RawCat,     '/metadata/raw/categories/<category>')
-    apidoc.add_resource(RawUuid,    '/metadata/raw/uuids/<uuid>')
-    apidoc.add_resource(Tags,        '/metadata/geodata/tags/<tags>')
-    apidoc.add_resource(Uuid,       '/metadata/geodata/uuids/<uuid>')
+    apidoc.add_resource(RawTags, '/metadata/raw/tags/<tags>')
+    apidoc.add_resource(RawCat, '/metadata/raw/categories/<category>')
+    apidoc.add_resource(RawUuid, '/metadata/raw/uuids/<uuid>')
+    apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
+    apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
 
-
-    ###### TEST actiniaCore
+    # ##### TEST actiniaCore
     # GET / POST
     apidoc.add_resource(ActiniaCoreConnection, '/processes/test/connection')
     # GET: list / POST: start job without writing into jobdb
@@ -99,7 +133,7 @@ def addEndpoints(app, apidoc):
         '/processes/test/jobs/<jobid>'
     )
 
-    ###### Loop
+    # ##### Loop
     # GET: list / POST: create (start job)
     apidoc.add_resource(
         JobLoopWrapper,
@@ -121,7 +155,7 @@ def addEndpoints(app, apidoc):
         '/processes/loop/jobs/<jobid>/operations/cancel'
     )
 
-    ###### sentinel1 actiniaCore
+    # ##### sentinel1 actiniaCore
     # GET: list / POST: create (start job)
     apidoc.add_resource(
         JobS1Wrapper,
@@ -143,11 +177,11 @@ def addEndpoints(app, apidoc):
         '/processes/sentinel1/jobs/<jobid>/operations/cancel'
     )
 
-    ##### WEBHOOK FROM ACTINIA-CORE
+    # #### WEBHOOK FROM ACTINIA-CORE
     # POST: trigger status update
     apidoc.add_resource(
-    Update,
-    '/resources/processes/operations/update'
+        Update,
+        '/resources/processes/operations/update'
     )
 
     # apidoc.add_resource(Actinia, '/actinia/<path:actinia_path>')
