@@ -41,6 +41,9 @@ from actinia_gdi.api.metadata import Uuid
 # endpoints loaded if run as actinia-core plugin
 def create_endpoints(flask_api):
 
+    # import all classes that are only needed in plugin mode
+    from actinia_gdi.api.grassmodule_management import ListModules
+
     app = flask_api.app
     apidoc = flask_api
 
@@ -67,6 +70,8 @@ def create_endpoints(flask_api):
     apidoc.add_resource(RawUuid, '/metadata/raw/uuids/<uuid>')
     apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
     apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
+
+    apidoc.add_resource(ListModules, '/modules')
 
 
 # endpoints loaded if run as standalone app
