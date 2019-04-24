@@ -42,8 +42,9 @@ from actinia_gdi.api.metadata import Uuid
 def create_endpoints(flask_api):
 
     # import all classes that are only needed in plugin mode
-    from actinia_gdi.api.grassmodule_management import ListModules
-    from actinia_gdi.api.gdi.gdi_ephemeral_processing_with_export import GdiAsyncEphemeralExportResource
+    from actinia_gdi.api.grassmodule import ListModules
+    from actinia_gdi.api.gdi_ephemeral_processing_with_export import GdiAsyncEphemeralExportResource
+    from actinia_gdi.api.grassmodule import DescribeModule
 
     app = flask_api.app
     apidoc = flask_api
@@ -77,6 +78,7 @@ def create_endpoints(flask_api):
         GdiAsyncEphemeralExportResource,
         '/locations/<string:location_name>/gdi_processing_async_export'
     )
+    apidoc.add_resource(DescribeModule, '/modules/<module>')
 
 
 # endpoints loaded if run as standalone app
