@@ -4,7 +4,7 @@
 # performance processing of geographical data that uses GRASS GIS for
 # computational tasks. For details, see https://actinia.mundialis.de/
 #
-# Copyright (c) 2016-2018 Sören Gebbert and mundialis GmbH & Co. KG
+# Copyright (c) 2019-present Sören Gebbert and mundialis GmbH & Co. KG
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -43,10 +43,8 @@ from actinia_core.resources.common.response_models import ProcessingResponseMode
 from actinia_core.resources.actinia_gdi_plugin.grassmodule_management import ListModules
 
 __license__ = "GPLv3"
-__author__ = "Sören Gebbert"
+__author__ = "Anika Bettge, Sören Gebbert"
 __copyright__ = "Copyright 2016-2018, Sören Gebbert and mundialis GmbH & Co. KG"
-__maintainer__ = "Sören Gebbert"
-__email__ = "soerengebbert@googlemail.com"
 
 
 DESCR="""Execute a user defined process chain in an ephemeral database
