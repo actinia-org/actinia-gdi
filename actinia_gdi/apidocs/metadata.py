@@ -39,7 +39,7 @@ connection_get_docs = {
     "summary": "Tests for active connection to Geonetwork opensource.",
     "description": "The request will ask the backend if it can successfully connect to Geonetwork.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "responses": {
         "200": {
@@ -53,7 +53,7 @@ connection_post_docs = {
     "summary": "Tests for active connection to Geonetwork opensource.",
     "description": "The request will ask the backend if it can successfully connect to Geonetwork.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "responses": {
         "200": {
@@ -72,7 +72,7 @@ rawTags_get_docs = {
     "summary": "Requests one or many tags from Geonetwork opensource.",
     "description": "The request will ask Geonetwork which metadata records are available for a certain tag or more tags separated by comma and returns the JSON response with these records.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "parameters": [
       {
@@ -103,7 +103,7 @@ rawCategory_get_docs = {
     "summary": "Requests a category from Geonetwork opensource.",
     "description": "The request will ask Geonetwork which metadata records are available for a certain category and returns the JSON response with these records. Requirement: a virtual CSW is defined in Geonetwork",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "parameters": [
       {
@@ -133,7 +133,7 @@ rawUuid_get_docs = {
     "summary": "Requests an uuid from Geonetwork opensource.",
     "description": "The request will ask Geonetwork which metadata records are available for a certain uuid and returns the JSON response with this record.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "parameters": [
       {
@@ -159,7 +159,7 @@ tags_get_docs = {
     "summary": "Get geodata object from requests to Geonetwork opensource by one or many tags.",
     "description": "The request will ask Geonetwork which metadata records are available for a certain tag or more tags separated by comma and returns a parsed record build from model. At the moment only the first record is returned.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "parameters": [
       {
@@ -183,7 +183,7 @@ uuid_get_docs = {
     "summary": "Get geodata object from requests to Geonetwork opensource by uuid.",
     "description": "The request will ask Geonetwork which metadata records are available for a certain uuid and returns a parsed record build from model. At the moment only the first record is returned.",
     "tags": [
-        "geonetwork"
+        "GeoNetwork"
     ],
     "parameters": [
       {

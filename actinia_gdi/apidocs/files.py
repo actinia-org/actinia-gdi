@@ -30,7 +30,7 @@ upload_post_docs = {
     "summary": "Upload file.",
     "description": "File can be uploaded, best used with https://bmvimetadaten.mundialis.de.",
     "tags": [
-        "file"
+        "File Management"
     ],
     "responses": {
         "200": {
