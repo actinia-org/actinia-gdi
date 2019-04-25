@@ -119,7 +119,7 @@ class DescribeModule(ResourceBase):
                               mapset_name="PERMANENT")
 
         process_chain = {"1": {"module": module,
-                               "interface-description": "True"}}
+                               "interface-description": True}}
 
         def describe_module(*args, process_chain=process_chain):
             processing = EphemeralModuleLister(*args, pc=process_chain)
