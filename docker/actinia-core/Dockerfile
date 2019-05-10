@@ -1,4 +1,4 @@
-FROM mundialis/actinia-core:develop
+FROM mundialis/actinia-core:latest
 
 ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1
 

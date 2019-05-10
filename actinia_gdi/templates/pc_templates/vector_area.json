@@ -1,0 +1,69 @@
+{
+    "id": "vector_area",
+    "description": "Copies zipcodes_wake and compute the areas in h.",
+    "template": {
+        "list": [
+            {
+                "id": "copy_vector_data",
+                "module": "g.copy",
+                "inputs": [
+                    {
+                        "param": "vector",
+                        "value": "zipcodes_wake,{{ name }}"
+                    }
+                ]
+            },
+            {
+                "id": "add_column_for_area",
+                "module": "v.db.addcolumn",
+                "inputs": [
+                    {
+                        "param": "map",
+                        "value": "{{ name }}"
+                    },
+                    {
+                        "param": "columns",
+                        "value": "{{ column_name }} DOUBLE PRECISION"
+                    }
+                ]
+            },
+            {
+                "id": "calculate_area",
+                "module": "v.to.db",
+                "inputs": [
+                    {
+                        "param": "map",
+                        "value": "{{ name }}"
+                    },
+                    {
+                        "param": "columns",
+                        "value": "{{ column_name }}"
+                    },
+                    {
+                        "param": "option",
+                        "value": "area"
+                    },
+                    {
+                        "param": "unit",
+                        "value": "h"
+                    }
+                ]
+            },
+            {
+                "id": "v_db_select",
+                "module": "v.db.select",
+                "inputs": [
+                    {
+                        "param": "map",
+                        "value": "{{ name }}"
+                    },
+                    {
+                        "param": "columns",
+                        "value": "{{ column_name }}"
+                    }
+                ]
+            }
+        ],
+        "version": "1"
+    }
+}

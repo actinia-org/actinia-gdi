@@ -58,8 +58,6 @@ curl -u actinia-gdi:actinia-gdi 'http://127.0.0.1:8088/api/v1/swagger.json'
 ```
 Inside the container, you can run GRASS with:
 ```
-export GISBASE="/usr/local/grass77/"
-
 # Download GRASS GIS test data and put it into a directory
 cd /actinia_core/grassdb
 wget https://grass.osgeo.org/sampledata/north_carolina/nc_spm_08_grass7.tar.gz && \
@@ -121,6 +119,9 @@ curl 'http://127.0.0.1:5000'
 
 ## dev notes:
 
+As actinia-gdi can be run as actinia-core plugin and standalone, the endpoint
+classes inherit either from flask_restful's Resource (standalone + plugin mode) or from the extended actinia-core ResourceBase (only plugin mode).
+
 __build actinia-gdi from checked out s2i image__
 ```
 cd docker/s2i-actinia-gdi-builder/
@@ -136,7 +137,7 @@ __test process chains in actinia-core:__
 curl -u actinia-gdi:actinia-gdi 'http://127.0.0.1:8088/api/v1/locations'
 
 JSON=pc.json
-curl -u actinia-gdi:actinia-gdi -X POST "http://127.0.0.1:8088/api/v1/locations/latlong/processing_async_export" \
+curl -u actinia-gdi:actinia-gdi -X POST "http://127.0.0.1:8088/api/v1/locations/nc_spm_08/processing_async_export" \
      -H 'accept: application/json' -H 'Content-Type: application/json' -d @$JSON \
      | json urls.status | xargs curl -u actinia-gdi:actinia-gdi -X GET
 

@@ -16,7 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-Documentation objects for GNOS api endpoints
+Documentation objects for GRASS modules and process chain template
+api endpoints
 """
 
 __author__ = "Carmen Tawalika"
@@ -26,7 +27,7 @@ __license__ = "Apache-2.0"
 
 from actinia_core.resources.common.response_models import ProcessingErrorResponseModel
 
-from actinia_gdi.model.grassmodule import Module, ModuleList
+from actinia_gdi.model.gmodules import Module, ModuleList
 
 
 null = "null"

@@ -40,7 +40,7 @@ from actinia_core.resources.common.process_chain import ProcessChainModel
 from actinia_core.resources.common.exceptions import AsyncProcessTermination
 from actinia_core.resources.common.response_models import ProcessingResponseModel, ProcessingErrorResponseModel
 
-from actinia_gdi.api.grassmodule import ListModules
+from actinia_gdi.api.gmodules.grass import ListModules
 
 __license__ = "GPLv3"
 __author__ = "Anika Bettge, Sören Gebbert"
