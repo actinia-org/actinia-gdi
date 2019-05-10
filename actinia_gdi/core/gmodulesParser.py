@@ -22,130 +22,20 @@
 #######
 
 """
-Module management
-
-
-* List all modules
+Module management to parser GRASS xml response
 
 """
-import os
-import shutil
-import uuid
 import xmltodict
 
-from actinia_core.resources.common.config import global_config
-from actinia_core.resources.ephemeral_processing import EphemeralProcessing
-from actinia_core.resources.common.response_models import \
-    StringListProcessingResultResponseModel, \
-    ProcessingErrorResponseModel
-
-from actinia_gdi.model.grassmodule import Module
-from actinia_gdi.model.grassmodule import ModuleParameter, ModuleParameterSchema
+from actinia_gdi.model.gmodules import Module
+from actinia_gdi.model.gmodules import ModuleParameter, ModuleParameterSchema
 from actinia_gdi.resources.logging import log
 
 
 __license__ = "GPLv3"
-__author__ = "Anika Bettge"
+__author__ = "Carmen Tawalika"
 __copyright__ = "Copyright 2019, mundialis"
-__maintainer__ = "Anika Bettge"
-
-
-def initGrass(self):
-        """
-        * not using enqueue_job to get always a response
-        * the function creates a new location cause not all users can access
-          a location
-        """
-
-        # check if location exists
-        location_name = 'location_for_listing_modules_' + str(uuid.uuid4())
-        location = os.path.join(global_config.GRASS_DATABASE, location_name) # '/actinia_core/grassdb/location_for_listing_modules'
-        # Check the location path
-        if os.path.isdir(location):
-            return self.get_error_response(message="Unable to create location. "
-                                                   "Location <%s> exists in global database." % location_name)
-        # Check also for the user database
-        location = os.path.join(self.grass_user_data_base, self.user_group, location_name) # '/actinia_core/userdata/superadmin/location_for_listing_modules'
-        # Check the location path
-        if os.path.isdir(location):
-            return self.get_error_response(message="Unable to create location. "
-                                                   "Location <%s> exists in user database." % location_name)
-
-        # create new location cause not each user can access a location
-        if not os.path.isdir(os.path.join(self.grass_user_data_base, self.user_group)):
-            os.mkdir(os.path.join(self.grass_user_data_base, self.user_group))
-        os.mkdir(location)
-        mapset = os.path.join(location, 'PERMANENT')
-        os.mkdir(mapset)
-        with open(os.path.join(mapset, 'DEFAULT_WIND'), 'w') as out:
-            out.write("proj:       3\nzone:       0\nnorth:      1N\n"
-                + "south:      0\neast:       1E\nwest:       0\ncols:       1"
-                + "\nrows:       1\ne-w resol:  1\nn-s resol:  1\ntop:        "
-                + "1.000000000000000\nbottom:     0.000000000000000\ncols3:   "
-                + "   1\nrows3:      1\ndepths:     1\ne-w resol3: 1\nn-s reso"
-                + "l3: 1\nt-b resol:  1")
-        with open(os.path.join(mapset, 'MYNAME'), 'w') as out:
-            out.write("")
-        with open(os.path.join(mapset, 'PROJ_EPSG'), 'w') as out:
-            out.write("epsg: 4326")
-        with open(os.path.join(mapset, 'PROJ_INFO'), 'w') as out:
-            out.write("name: WGS 84\ndatum: wgs84\nellps: wgs84\nproj: ll\n"
-                + "no_defs: defined\ntowgs84: 0.000,0.000,0.000")
-        with open(os.path.join(mapset, 'PROJ_UNITS'), 'w') as out:
-            out.write("unit: degree\nunits: degrees\nmeters: 1.0")
-        with open(os.path.join(mapset, 'WIND'), 'w') as out:
-            out.write("proj:       3\nzone:       0\nnorth:      1N\n"
-                + "south:      0\neast:       1E\nwest:       0\ncols:       1"
-                + "\nrows:       1\ne-w resol:  1\nn-s resol:  1\ntop:        "
-                + "1.000000000000000\nbottom:     0.000000000000000\ncols3:   "
-                + "   1\nrows3:      1\ndepths:     1\ne-w resol3: 1\nn-s reso"
-                + "l3: 1\nt-b resol:  1")
-
-        return location_name
-
-def deinitGrass(self, location_name):
-        """
-        * the function deletes above location
-        """
-        # remove location
-        location = os.path.join(global_config.GRASS_DATABASE, location_name)
-        if os.path.isdir(location):
-            shutil.rmtree(location)
-        location = os.path.join(self.grass_user_data_base, self.user_group, location_name)
-        if os.path.isdir(location):
-            shutil.rmtree(location)
-        # del self.user_credentials["permissions"]['accessible_datasets'][location_name]
-
-
-class EphemeralModuleLister(EphemeralProcessing):
-    """List all modules
-    """
-
-    def __init__(self, *args, pc):
-        EphemeralProcessing.__init__(self, *args)
-        self.response_model_class = StringListProcessingResultResponseModel
-        self.process_chain = pc
-
-    def _execute(self, skip_permission_check=True):
-
-        self._setup()
-
-        # Create the temporary database and link all available mapsets into is
-        self._create_temp_database()
-
-        process_list = self._validate_process_chain(
-            process_chain=self.process_chain,
-            skip_permission_check=True
-        )
-
-        self._create_grass_environment(
-            grass_data_base=self.temp_grass_data_base,
-            mapset_name="PERMANENT"
-        )
-
-        self._execute_process_list(process_list)
-
-        self.module_results = self.module_output_log[0]["stdout"]
+__maintainer__ = "Carmen Tawalika"
 
 
 def logstring(module_id, param, key):
@@ -155,6 +45,16 @@ def logstring(module_id, param, key):
 def setParameterKey(module_id, parameter):
     try:
         key = parameter['@name']
+    except KeyError:
+        key = None
+        logstring(module_id, key, "name")
+
+    return key
+
+
+def setVirtualParameterKey(module_id, parameter):
+    try:
+        key = module_id + '_' + parameter['@name']
     except KeyError:
         key = None
         logstring(module_id, key, "name")
@@ -197,7 +97,7 @@ def setParamType(module_id, key, parameter, schema_kwargs):
     try:
         # grass parameter types can only be string, double or integer
         gtype = parameter['@type']
-        if gtype == 'float' or gtype == 'double':
+        if gtype in ('float', 'double'):
             gtype = 'number'
         schema_kwargs['type'] = gtype
     except KeyError:
@@ -246,7 +146,7 @@ def setParameterEnum(parameter, schema_kwargs):
     return schema_kwargs
 
 
-def ParseInterfaceDescription(xml_string):
+def ParseInterfaceDescription(xml_string, keys=None):
     """Parses output of GRASS interface-description
     and returns openEO process object
     """
@@ -272,10 +172,16 @@ def ParseInterfaceDescription(xml_string):
         flags = []
 
     for parameter in grass_params:
+
         kwargs = dict()
         schema_kwargs = dict()
 
-        key = setParameterKey(module_id, parameter)
+        if keys:
+            key = setVirtualParameterKey(module_id, parameter)
+            if key not in keys:
+                continue
+        else:
+            key = setParameterKey(module_id, parameter)
 
         schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
         kwargs = setParameterDescription(module_id, key, parameter, kwargs)
@@ -292,6 +198,10 @@ def ParseInterfaceDescription(xml_string):
         del schema_kwargs
 
     for parameter in flags:
+        # not possible to specify flag values via template at the moment
+        if keys:
+            continue
+
         kwargs = dict()
         schema_kwargs = dict()
         schema_kwargs['type'] = 'boolean'

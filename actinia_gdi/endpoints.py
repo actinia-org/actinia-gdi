@@ -37,14 +37,21 @@ from actinia_gdi.api.metadata import RawUuid
 from actinia_gdi.api.metadata import Tags
 from actinia_gdi.api.metadata import Uuid
 
+from actinia_gdi.api.gmodules.actinia import ListProcessChainTemplates
+
 
 # endpoints loaded if run as actinia-core plugin
 def create_endpoints(flask_api):
 
     # import all classes that are only needed in plugin mode
-    from actinia_gdi.api.grassmodule import ListModules
-    from actinia_gdi.api.gdi_ephemeral_processing_with_export import GdiAsyncEphemeralExportResource
-    from actinia_gdi.api.grassmodule import DescribeModule
+    from actinia_gdi.api.gmodules.grass import ListModules
+    from actinia_gdi.api.gmodules.grass import DescribeModule
+    from actinia_gdi.api.gmodules.actinia import DescribeProcessChainTemplate
+    from actinia_gdi.api.gmodules.combined import ListVirtualModules
+    from actinia_gdi.api.gmodules.combined import DescribeVirtualModule
+
+    from actinia_gdi.api.gdi_ephemeral_processing_with_export import \
+        GdiAsyncEphemeralExportResource
 
     app = flask_api.app
     apidoc = flask_api
@@ -73,12 +80,20 @@ def create_endpoints(flask_api):
     apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
     apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
 
-    apidoc.add_resource(ListModules, '/modules')
+    apidoc.add_resource(ListModules, '/grassmodules')
+    apidoc.add_resource(DescribeModule, '/grassmodules/<grassmodule>')
+
+    apidoc.add_resource(ListProcessChainTemplates, '/actiniamodules')
+    apidoc.add_resource(DescribeProcessChainTemplate,
+                        '/actiniamodules/<actiniamodule>')
+
+    apidoc.add_resource(ListVirtualModules, '/modules')
+    apidoc.add_resource(DescribeVirtualModule, '/modules/<module>')
+
     apidoc.add_resource(
         GdiAsyncEphemeralExportResource,
         '/locations/<string:location_name>/gdi_processing_async_export'
     )
-    apidoc.add_resource(DescribeModule, '/modules/<module>')
 
 
 # endpoints loaded if run as standalone app
@@ -195,6 +210,8 @@ def addEndpoints(app, apidoc):
         Update,
         '/resources/processes/operations/update'
     )
+
+    apidoc.add_resource(ListProcessChainTemplates, '/actiniamodules')
 
     # apidoc.add_resource(Actinia, '/actinia/<path:actinia_path>')
     # allows "/" inside variable

@@ -24,8 +24,14 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 
+# this environment is used for all cases where individual templates are loaded
 tplEnv = Environment(
     loader=PackageLoader('actinia_gdi', 'templates')
+)
+
+# this environment is used for process chain templates only
+pcTplEnv = Environment(
+    loader=PackageLoader('actinia_gdi', 'templates/pc_templates')
 )

@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-Model classes for grassmodule object
+Model classes for grassmodule and process chain template object
 """
 
 __author__ = "Anika Bettge, Carmen Tawalika"
