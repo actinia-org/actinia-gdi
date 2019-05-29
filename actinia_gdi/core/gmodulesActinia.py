@@ -103,6 +103,7 @@ def createActiniaModule(self, processchain):
     count = 1
     exec_process_chain = dict()
     aggregated_keys = []
+    aggregated_vals = []
 
     for i in processes:
 
@@ -116,11 +117,13 @@ def createActiniaModule(self, processchain):
 
         # aggregate all keys where values are a variable
         # in the processchain template
+        # only aggregate them if the template value differs
         inputs = i['inputs']
         for j in inputs:
             val = j['value']
             key = module + '_' + j['param']
-            if '{{ ' in val and ' }}' in val:
+            if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
+                aggregated_vals.append(val)
                 aggregated_keys.append(key)
 
     response = run_process_chain(self, exec_process_chain)
