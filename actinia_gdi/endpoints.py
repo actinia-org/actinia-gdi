@@ -38,7 +38,6 @@ from actinia_gdi.api.metadata import Tags
 from actinia_gdi.api.metadata import Uuid
 
 
-
 # endpoints loaded if run as actinia-core plugin
 def create_endpoints(flask_api):
 
