@@ -109,6 +109,7 @@ def createActiniaModule(self, processchain):
 
         # create the exec_process_chain item
         module = i['module']
+        id = i['id']
         item_key = str(count)
         pc_item = {item_key: {"module": module,
                               "interface-description": True}}
@@ -121,7 +122,7 @@ def createActiniaModule(self, processchain):
         inputs = i['inputs']
         for j in inputs:
             val = j['value']
-            key = module + '_' + j['param']
+            key = module + '_' + j['param'] # TODO id
             if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
                 aggregated_vals.append(val)
                 aggregated_keys.append(key)
@@ -150,3 +151,32 @@ def createActiniaModule(self, processchain):
     )
 
     return virtual_module
+
+
+def fillTemplateFromProcessChain(module):
+
+    tpl_file = module["module"] + '.json'
+    tpl_placeholder = renderTemplate(module["module"])
+    tpllist = tpl_placeholder['template']['list']
+
+    kwargs = {}
+
+    for input in module['inputs']:
+        [module, param] = input['param'].split('_') # TODO if using id
+        val = input['value']
+        module_idx = -1
+        for grass_module in tpllist:
+            module_idx += 1
+            if module == grass_module['module']: # TODO if using id ('id')
+                param_id = -1
+                for grass_input in grass_module['inputs']:
+                    param_id += 1
+                    if param == grass_input['param']:
+                        tplvar = tpllist[module_idx]['inputs'][param_id]['value']
+                        var = tplvar.strip('{ }')
+                        kwargs[var] = val
+
+    tpl = pcTplEnv.get_template(tpl_file)
+    pc_template = json.loads(tpl.render(**kwargs).replace('\n', ''))
+
+    return (pc_template['template']['list'])

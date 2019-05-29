@@ -40,7 +40,12 @@ from actinia_core.resources.common.process_chain import ProcessChainModel
 from actinia_core.resources.common.exceptions import AsyncProcessTermination
 from actinia_core.resources.common.response_models import ProcessingResponseModel, ProcessingErrorResponseModel
 
-from actinia_gdi.api.gmodules.grass import ListModules
+# from actinia_gdi.api.gmodules.grass import ListModules
+from actinia_gdi.core.gmodulesActinia import createProcessChainTemplateList
+from actinia_gdi.core.gmodulesActinia import fillTemplateFromProcessChain
+from actinia_gdi.core.gmodulesGrass import createModuleList
+from actinia_gdi.model.responseModels import SimpleResponseModel
+
 
 __license__ = "GPLv3"
 __author__ = "Anika Bettge, Sören Gebbert"
@@ -118,26 +123,24 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
         """Execute a user defined process chain in an ephemeral location/mapset and store the processing results
         for download.
         """
-        # get module list
-        list_module_resource = ListModules()
-        module_list  = json.loads(list_module_resource.get().response[0])
+        # get grass and actinia module lists
+        module_list = createModuleList(self)
+        pc_list = createProcessChainTemplateList()
+        # TODO: find out size before ?
         grass_module_list = []
         actinia_module_list = []
-        for module in module_list['processes']:
-            if 'grass-module' in module['categories']:
-                grass_module_list.append(module['id'])
-            elif 'actinia-module' in module['categories']:
-                actinia_module_list.append(module['id'])
-            else:
-                return make_response(jsonify(SimpleResponseModel(status="error",
-                        message="Module %s is neither a grass- nor an actinia-module." % module['id'])), 409)
+
+        for module in module_list:
+            grass_module_list.append(module['id'])
+
+        for module in pc_list:
+            actinia_module_list.append(module['id'])
 
         rdc = self.preprocess(has_json=True, location_name=location_name)
 
         if rdc:
             rdc.set_storage_model_to_file()
 
-            # TODO get pc and replace it!!
             new_pc = []
             for module in rdc.request_data['list']:
                 if "module" in module:
@@ -147,12 +150,14 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
                     elif name in grass_module_list:
                         new_pc.append(module)
                     elif name in actinia_module_list:
-                        # TODO replace the virtual module with the pc and append it to the new_pc
-                        module_pc =  module# TODO
-                        new_pc.append(module_pc)
+                        module_pc = fillTemplateFromProcessChain(module)
+                        new_pc.extend(module_pc)
                     else:
-                        return make_response(jsonify(SimpleResponseModel(status="error",
-                                message="Module %s is not of type importer, exporter, grass-module or an actinia-module." % name)), 409)
+                        msg = "Module %s is not of type importer, exporter, grass-module or an actinia-module." % name
+                        return make_response(jsonify(SimpleResponseModel(
+                            status="error",
+                            message=msg
+                        )), 409)
                 else:
                     new_pc.append(module)
 
