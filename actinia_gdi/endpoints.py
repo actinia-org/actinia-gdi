@@ -37,8 +37,6 @@ from actinia_gdi.api.metadata import RawUuid
 from actinia_gdi.api.metadata import Tags
 from actinia_gdi.api.metadata import Uuid
 
-from actinia_gdi.api.gmodules.actinia import ListProcessChainTemplates
-
 
 # endpoints loaded if run as actinia-core plugin
 def create_endpoints(flask_api):
@@ -46,6 +44,7 @@ def create_endpoints(flask_api):
     # import all classes that are only needed in plugin mode
     from actinia_gdi.api.gmodules.grass import ListModules
     from actinia_gdi.api.gmodules.grass import DescribeModule
+    from actinia_gdi.api.gmodules.actinia import ListProcessChainTemplates
     from actinia_gdi.api.gmodules.actinia import DescribeProcessChainTemplate
     from actinia_gdi.api.gmodules.combined import ListVirtualModules
     from actinia_gdi.api.gmodules.combined import DescribeVirtualModule
@@ -210,8 +209,6 @@ def addEndpoints(app, apidoc):
         Update,
         '/resources/processes/operations/update'
     )
-
-    apidoc.add_resource(ListProcessChainTemplates, '/actiniamodules')
 
     # apidoc.add_resource(Actinia, '/actinia/<path:actinia_path>')
     # allows "/" inside variable
