@@ -144,3 +144,38 @@ curl -u actinia-gdi:actinia-gdi -X POST "http://127.0.0.1:8088/api/v1/locations/
 curl -u actinia-gdi:actinia-gdi -X POST "http://127.0.0.1:8088/api/v1/locations/mynewlocation" -H 'accept: application/json' -H \
   'Content-Type: application/json' -d '{"epsg": "25832"}'
 ```
+
+__copy paste for dev__
+```
+
+docker-compose --file docker/docker-compose-plugin.yml run --rm \
+  --service-ports -w /src/actinia-gdi --entrypoint bash \
+  -v $HOME/repos/actinia/actinia_core/src:/src/actinia_core/src \
+  -v $HOME/repos/actinia/actinia-gdi/actinia_gdi:/src/actinia-gdi/actinia_gdi actinia-core
+
+bash /src/start-dev.sh
+
+(cd /src/actinia_core && python3 setup.py install) && \
+    python3 setup.py install && \
+    gunicorn -b 0.0.0.0:8088 -w 1 actinia_core.main:flask_app
+
+```
+
+
+__test new__
+```
+http://127.0.0.1:8088/api/v1/grassmodules
+http://127.0.0.1:8088/api/v1/grassmodules/d.barscale
+http://127.0.0.1:8088/api/v1/grassmodules/d.barscale3
+
+http://127.0.0.1:8088/api/v1/actiniamodules
+http://127.0.0.1:8088/api/v1/actiniamodules/vector_area
+
+http://127.0.0.1:8088/api/v1/modules
+http://127.0.0.1:8088/api/v1/modules/d.barscale
+http://127.0.0.1:8088/api/v1/modules/vector_area
+http://127.0.0.1:8088/api/v1/modules/vector_area5
+
+http://127.0.0.1:8088/api/v1/swagger.json
+
+```
