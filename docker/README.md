@@ -14,6 +14,12 @@ docker-compose --file docker/docker-compose-plugin.yml build
 docker-compose --file docker/docker-compose-plugin.yml up
 ```
 
+To run actinia-gdi with actinia-core only based on ready-to-use images, run
+```
+docker-compose --file docker/docker-compose-plugin-prod.yml build
+docker-compose --file docker/docker-compose-plugin-prod.yml up
+```
+
 For actinia-gdi development, run and enter the running container.
 ```
 docker-compose --file docker/docker-compose-plugin.yml run --rm \
