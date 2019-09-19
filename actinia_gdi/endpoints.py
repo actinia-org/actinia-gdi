@@ -61,8 +61,11 @@ def create_endpoints(flask_api):
             return current_app.send_static_file('index.html')
         except werkzeug.exceptions.NotFound:
             log.debug('No index.html found in static folder. Serving backup.')
+            # when actinia-gdi is installed in single mode, the swagger
+            # endpoint would be "latest/api/swagger.json". As api docs exist in
+            # single mode, use this fallback for plugin mode.
             return ("""<h1 style='color:red'>actinia GDI</h1>
-                <a href="latest/api/swagger.json">API docs</a>""")
+                <a href="api/v1/swagger.json">API docs</a>""")
 
     @app.route('/<path:filename>')
     def static_content(filename):
