@@ -1,71 +1,17 @@
 # actinia gdi
 
-## Requirements
-```
-sudo apt install \
-    python-virtualenv\
-    python3\
-    python3-dev\
-```
-* a running GeoNetwork instance
-* a running PostgreSQL instance
+You can run actinia-gdi in multiple ways:
 
-## DEV - Installation
-For local developments outside of docker, it is preferred to run actinia-gdi in a virtual python environment.
+* as actinia-core plugin
+* as standalone app with gunicorn, connected with a running actinia-core instance
 
-Clone repository, create virtual environment and activate it:
-```
-git clone git@github.com:mundialis/actinia-gdi.git
-cd actinia-gdi
-virtualenv -p python3 venv
-. venv/bin/activate
-```
+Depending on how you run, it, actinia-gdi has different endpoints as some make only sense in plugin mode or vice versa. See `actinia_gdi/endpoints.py`. Therefore a running postgres instance is only needed in standalone mode. If used as actinia-core plugin, the main.py is not executed. In standalone-mode, GRASS GIS is not required. Therefore, endpoints which needs GRASS GIS access, are only added in plugin-mode.
 
-Change configuration in ```config/mount```
+## Installation
+For DEV setup or deployments, see docker/README.md.
 
-Install required Python packages into the virtual environment:
-```
-pip install -r requirements.txt
-python setup.py install
-```
-Run tests:
-```
-python setup.py test
-```
-
-Run the server for development:
-```
-python -m actinia_gdi.main
-```
-
-Or for production use actinia_gdi.wsgi as WSGI callable:
-```
-gunicorn -b :5000 actinia_gdi.wsgi
-```
-
-If all done, leave environment
-```
-deactivate
-```
-
-## INT - Installation
-
-```
-git clone git@github.com:mundialis/actinia-gdi.git
-cd actinia-gdi
-docker build s2i-actinia-gdi-builder -t s2i-actinia-gdi-builder
-s2i build . s2i-actinia-gdi-builder actinia-gdi
-docker-compose -f ~/docker/docker-compose.yml up -d actinia-gdi
-```
-
-## INT - Update
-
-```
-cd actinia-gdi
-s2i build . s2i-actinia-gdi-builder actinia-gdi
-
-docker-compose -f ~/docker/docker-compose.yml up -d actinia-gdi
-```
+## actinia-core process-chain templating
+see actinia-module.md
 
 ## DEV notes:
 

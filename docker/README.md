@@ -168,6 +168,79 @@ bash /src/start-dev.sh
 ```
 
 
+
+## As standalone app without docker
+
+###Requirements
+```
+sudo apt install \
+    python-virtualenv\
+    python3\
+    python3-dev\
+```
+* a running GeoNetwork instance
+* a running PostgreSQL instance
+
+### DEV - Installation
+For local developments outside of docker, it is preferred to run actinia-gdi in a virtual python environment.
+
+Clone repository, create virtual environment and activate it:
+```
+git clone git@github.com:mundialis/actinia-gdi.git
+cd actinia-gdi
+virtualenv -p python3 venv
+. venv/bin/activate
+```
+
+Change configuration in ```config/mount```
+
+Install required Python packages into the virtual environment:
+```
+pip install -r requirements.txt
+python setup.py install
+```
+Run tests:
+```
+python setup.py test
+```
+
+Run the server for development:
+```
+python -m actinia_gdi.main
+```
+
+Or for production use actinia_gdi.wsgi as WSGI callable:
+```
+gunicorn -b :5000 actinia_gdi.wsgi
+```
+
+If all done, leave environment
+```
+deactivate
+```
+
+## As standalone app with s2i (e.g. for INT - Installation)
+
+```
+git clone git@github.com:mundialis/actinia-gdi.git
+cd actinia-gdi
+docker build s2i-actinia-gdi-builder -t s2i-actinia-gdi-builder
+s2i build . s2i-actinia-gdi-builder actinia-gdi
+docker-compose -f ~/docker/docker-compose.yml up -d actinia-gdi
+```
+
+__INT - Update__
+
+```
+cd actinia-gdi
+s2i build . s2i-actinia-gdi-builder actinia-gdi
+
+docker-compose -f ~/docker/docker-compose.yml up -d actinia-gdi
+```
+
+
+##
+
 __test new__
 ```
 http://127.0.0.1:8088/api/v1/grassmodules
