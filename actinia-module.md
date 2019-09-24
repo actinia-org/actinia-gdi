@@ -476,3 +476,16 @@ List / Describe combined
 Full API docs
 
 * http://127.0.0.1:8088/api/v1/swagger.json
+
+
+
+### 6. Additional Notes
+
+The self-description tries to comply the [openEO API](https://open-eo.github.io/openeo-api/apireference/#tag/Process-Discovery/paths/~1processes/get) where applicable.
+At some points, however, we have to divert from their API:
+
+* `returns` section may contain multiple outputs and has the same structure
+as the `parameters` sections.
+
+A parameter will only be added to the `returns` section if it contains the property `gisprompt.@age` and only if that value equals `'new'`. In all other cases, the parameter will be added to the `parameters` section.
+
