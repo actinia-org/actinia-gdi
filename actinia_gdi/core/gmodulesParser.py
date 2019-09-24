@@ -161,6 +161,16 @@ def isOutput(parameter):
         return False
 
 
+def getReturns(parameter):
+    returns = {}
+    return_keys = ['description', 'media_type', 'schema']
+    parameter_keys = parameter.keys()
+    for key in return_keys:
+        if key in parameter_keys:
+            returns[key] = parameter[key]
+    return returns
+
+
 def ParseInterfaceDescription(xml_string, keys=None):
     """Parses output of GRASS interface-description
     and returns openEO process object
@@ -210,7 +220,7 @@ def ParseInterfaceDescription(xml_string, keys=None):
             schema=ModuleParameterSchema(**schema_kwargs)
         )
         if isOutput(parameter):
-            returns[key] = param_object
+            returns = getReturns(param_object)
         else:
             parameters[key] = param_object
         del kwargs
