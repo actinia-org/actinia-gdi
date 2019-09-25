@@ -12,6 +12,7 @@ To run actinia-gdi with actinia-core, run
 ```
 docker-compose --file docker/docker-compose-plugin.yml build
 docker-compose --file docker/docker-compose-plugin.yml up
+# if a redis db is running locally this will fail. Run /etc/init.d/redis-server stop and try again
 ```
 
 To run actinia-gdi with actinia-core only based on ready-to-use images, run
@@ -33,7 +34,7 @@ python3 setup.py install
 bash /src/start-dev.sh
 
 # python3 -m actinia_core.main
-gunicorn -b 0.0.0.0:8088 -w 1 actinia_core.main:flask_app
+gunicorn -b 0.0.0.0:8088 -w 1 --access-logfile=- -k gthread actinia_core.main:flask_app
 ```
 
 
@@ -114,7 +115,7 @@ __Inside the container, run the actinia-gdi server with mounted source code:__
 python3 setup.py install
 
 # python3 -m actinia_gdi.main
-gunicorn -b 0.0.0.0:5000 -w 1 actinia_gdi.wsgi
+gunicorn -b 0.0.0.0:5000 -w 1 --access-logfile=- -k gthread actinia_gdi.wsgi
 ```
 
 __And test from outside with API calls, e.g.:__
@@ -163,7 +164,8 @@ bash /src/start-dev.sh
 
 (cd /src/actinia_core && python3 setup.py install) && \
     python3 setup.py install && \
-    gunicorn -b 0.0.0.0:8088 -w 1 actinia_core.main:flask_app
+    gunicorn -b 0.0.0.0:8088 -w 1 --access-logfile=- -k gthread actinia_core.main:flask_app
+
 
 ```
 
@@ -211,7 +213,8 @@ python -m actinia_gdi.main
 
 Or for production use actinia_gdi.wsgi as WSGI callable:
 ```
-gunicorn -b :5000 actinia_gdi.wsgi
+gunicorn -b :5000 -w 1 --access-logfile=- -k gthread actinia_gdi.wsgi
+
 ```
 
 If all done, leave environment
