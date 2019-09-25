@@ -146,6 +146,21 @@ def setParameterEnum(parameter, schema_kwargs):
     return schema_kwargs
 
 
+def isOutput(parameter):
+    """ Checks if parameter is output parameter.
+    Returns True if parameter has key 
+    'gisprompt.age' == 'new',
+    False otherwise.
+    """
+    try:
+        if '@age' in parameter['gisprompt'].keys():
+            return (parameter['gisprompt']['@age'] == 'new')
+        else:
+            return False
+    except KeyError:
+        return False
+
+
 def ParseInterfaceDescription(xml_string, keys=None):
     """Parses output of GRASS interface-description
     and returns openEO process object
@@ -158,6 +173,7 @@ def ParseInterfaceDescription(xml_string, keys=None):
     categories = gm_dict['keywords'].replace(' ', '').split(',')
     categories.append('grass-module')
     parameters = {}
+    returns = {}
 
     try:
         grass_params = gm_dict['parameter']
@@ -193,7 +209,10 @@ def ParseInterfaceDescription(xml_string, keys=None):
             **kwargs,
             schema=ModuleParameterSchema(**schema_kwargs)
         )
-        parameters[key] = param_object
+        if isOutput(parameter):
+            returns[key] = param_object
+        else:
+            parameters[key] = param_object
         del kwargs
         del schema_kwargs
 
@@ -224,7 +243,8 @@ def ParseInterfaceDescription(xml_string, keys=None):
         id=module_id,
         description=description,
         categories=sorted(categories),
-        parameters=parameters
+        parameters=parameters,
+        returns=returns
     )
 
     return grass_module
