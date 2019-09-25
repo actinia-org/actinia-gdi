@@ -457,22 +457,22 @@ Both are special modules from actinia-core. Safety mechanisms are already implem
 
 List / Describe only GRASS Modules
 
-* http://127.0.0.1:8088/api/v1/grassmodules
-* http://127.0.0.1:8088/api/v1/grassmodules/d.barscale
-* http://127.0.0.1:8088/api/v1/grassmodules/d.barscale3
+* GET /grassmodules
+* GET /grassmodules/d.barscale
+* GET /grassmodules/d.barscale3
 
 List / Describe only Modules (process-chain templates)
 
-* http://127.0.0.1:8088/api/v1/actiniamodules
-* http://127.0.0.1:8088/api/v1/actiniamodules/vector_area
+* GET /actiniamodules
+* GET /actiniamodules/vector_area
 
 List / Describe combined
 
-* http://127.0.0.1:8088/api/v1/modules
-* http://127.0.0.1:8088/api/v1/modules/d.barscale
-* http://127.0.0.1:8088/api/v1/modules/vector_area
-* http://127.0.0.1:8088/api/v1/modules/vector_area5
+* GET /modules
+* GET /modules/d.barscale
+* GET /modules/vector_area
+* GET /modules/vector_area5
 
 Full API docs
 
-* http://127.0.0.1:8088/api/v1/swagger.json
+* GET /swagger.json
