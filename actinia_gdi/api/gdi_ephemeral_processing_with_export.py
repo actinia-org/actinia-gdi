@@ -158,6 +158,12 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
                                 status="error",
                                 message=msg
                             )), 409)
+                        elif module_pc is None:
+                            msg = "Invalid request for %s" % (name)
+                            return make_response(jsonify(SimpleResponseModel(
+                                status="error",
+                                message=msg
+                            )), 409)
                         else:
                             new_pc.extend(module_pc)
                     else:

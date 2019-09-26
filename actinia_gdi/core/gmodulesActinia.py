@@ -191,6 +191,8 @@ def fillTemplateFromProcessChain(module):
             inOrOutputs.append(item)
 
     for item in inOrOutputs:
+        if (item.get('param') is None) or (item.get('value') is None):
+            return None
         [module, param] = item['param'].split('_')  # TODO if using id
         val = item['value']
         module_idx = -1
