@@ -25,6 +25,8 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
+import copy
+
 from actinia_core.resources.common.response_models import ProcessingErrorResponseModel
 
 from actinia_gdi.model.gmodules import Module, ModuleList
@@ -50,18 +52,19 @@ listModules_get_docs = {
         }
     }
 }
-
+Module={}
+ProcessingErrorResponseModel={}
 
 describeModule_get_docs = {
     'tags': ['Module Management'],
     "parameters": [
-      {
-        "in": "path",
-        "name": "module",
-        "type": "string",
-        "description": "The name of a module",
-        "required": True
-      }
+        {
+            "in": "path",
+            "name": "module",
+            "type": "string",
+            "description": "The name of a module",
+            "required": True
+        }
     ],
     'description': 'Get the description of a module. '
                    'Minimum required user role: user.',
@@ -77,3 +80,10 @@ describeModule_get_docs = {
         }
     }
 }
+
+
+describeActiniaModule_get_docs = copy.deepcopy(describeModule_get_docs)
+describeActiniaModule_get_docs['parameters'][0]['name'] = "actiniamodule"
+
+describeGrassModule_get_docs = copy.deepcopy(describeModule_get_docs)
+describeGrassModule_get_docs['parameters'][0]['name'] = "grassmodule"

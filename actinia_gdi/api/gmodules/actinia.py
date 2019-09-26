@@ -70,7 +70,7 @@ class DescribeProcessChainTemplate(ResourceBase):
     Contains swagger documentation
     """
 
-    @swagger.doc(gmodules.describeModule_get_docs)
+    @swagger.doc(gmodules.describeActiniaModule_get_docs)
     def get(self, actiniamodule):
         """Describe an actinia module (process chain template).
         """

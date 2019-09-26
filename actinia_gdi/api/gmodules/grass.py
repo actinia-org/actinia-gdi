@@ -68,7 +68,7 @@ class DescribeModule(ResourceBase):
     Contains HTTP GET endpoint
     Contains swagger documentation
     """
-    @swagger.doc(gmodules.describeModule_get_docs)
+    @swagger.doc(gmodules.describeGrassModule_get_docs)
     def get(self, grassmodule):
         """Describe a GRASS GIS module.
         """
