@@ -1,15 +1,25 @@
 {
     "id": "vector_area",
-    "description": "Computes the areas in h for selected map.",
+    "description": "Copies vector and computes the areas in h.",
     "template": {
         "list": [
+            {
+                "id": "copy_vector_data",
+                "module": "g.copy",
+                "inputs": [
+                    {
+                        "param": "vector",
+                        "value": "{{ name_and_copy }}"
+                    }
+                ]
+            },
             {
                 "id": "add_column_for_area",
                 "module": "v.db.addcolumn",
                 "inputs": [
                     {
                         "param": "map",
-                        "value": "{{ name }}"
+                        "value": "{{ copy }}"
                     },
                     {
                         "param": "columns",
@@ -23,7 +33,7 @@
                 "inputs": [
                     {
                         "param": "map",
-                        "value": "{{ name }}"
+                        "value": "{{ copy }}"
                     },
                     {
                         "param": "columns",
@@ -31,11 +41,7 @@
                     },
                     {
                         "param": "option",
-                        "value": "area"
-                    },
-                    {
-                        "param": "unit",
-                        "value": "h"
+                        "value": "{{ option }}"
                     }
                 ]
             },
@@ -45,7 +51,7 @@
                 "inputs": [
                     {
                         "param": "map",
-                        "value": "{{ name }}"
+                        "value": "{{ copy }}"
                     },
                     {
                         "param": "columns",
