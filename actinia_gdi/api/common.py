@@ -26,7 +26,7 @@ __license__ = "Apache-2.0"
 
 from flask import make_response, jsonify
 
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.core import common
 from actinia_gdi.resources.config import ACTINIACORE
 from actinia_gdi.resources.config import GEONETWORK
@@ -40,7 +40,7 @@ def checkConnection(name):
       name (string): resource to test. Can be 'actinia-core' or 'geonetwork'
 
     Returns:
-      response (Response): of type SimpleResponseModel telling
+      response (Response): of type SimpleStatusCodeResponseModel telling
       connection success or failure
     """
 
@@ -59,10 +59,10 @@ def checkConnection(name):
         log.error("Don't know which connection to test")
 
     if records is not None:
-        res = jsonify(SimpleResponseModel(status=200, message="success"))
+        res = jsonify(SimpleStatusCodeResponseModel(status=200, message="success"))
         return make_response(res, 200)
     elif records is None:
-        res = jsonify(SimpleResponseModel(status=404, message="failure"))
+        res = jsonify(SimpleStatusCodeResponseModel(status=404, message="failure"))
         return make_response(res, 200)
 
 

@@ -24,7 +24,7 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 
 upload_post_docs = {
     "summary": "Upload file.",
@@ -35,7 +35,7 @@ upload_post_docs = {
     "responses": {
         "200": {
             "description": "Success or failure of connection",
-            "schema": SimpleResponseModel
+            "schema": SimpleStatusCodeResponseModel
         }
     }
 }

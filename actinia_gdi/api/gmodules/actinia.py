@@ -39,7 +39,7 @@ from actinia_gdi.apidocs import gmodules
 from actinia_gdi.core.gmodulesActinia import createProcessChainTemplateList
 from actinia_gdi.core.gmodulesActinia import createActiniaModule
 from actinia_gdi.model.gmodules import ModuleList
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 
 
 __license__ = "GPLv3"
@@ -80,5 +80,5 @@ class DescribeProcessChainTemplate(ResourceBase):
             return make_response(jsonify(virtual_module), 200)
         except Exception:
             msg = 'Error looking for actinia module "' + actiniamodule + '".'
-            res = (jsonify(SimpleResponseModel(status=404, message=msg)))
+            res = (jsonify(SimpleStatusCodeResponseModel(status=404, message=msg)))
             return make_response(res, 404)

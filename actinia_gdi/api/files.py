@@ -35,7 +35,7 @@ from werkzeug.utils import secure_filename
 from actinia_gdi.apidocs import files
 from actinia_gdi.resources.config import FILEUPLOAD
 from actinia_gdi.core.gnosWriter import create
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.model.responseModels import FileUploadResponseModel
 from actinia_gdi.resources.logging import log
 
@@ -48,7 +48,7 @@ class Upload(Resource):
     """
 
     def get(self):
-        res = jsonify(SimpleResponseModel(
+        res = jsonify(SimpleStatusCodeResponseModel(
             status=405,
             message="Method Not Allowed"
         ))
