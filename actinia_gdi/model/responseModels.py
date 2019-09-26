@@ -28,14 +28,14 @@ from flask import jsonify
 from flask_restful_swagger_2 import Schema
 
 
-class SimpleResponseModel(Schema):
+class SimpleStatusCodeResponseModel(Schema):
     """Simple response schema to inform about status.
 
     """
     type = 'object'
     properties = {
         'status': {
-            'type': 'int',
+            'type': 'number',
             'description': 'The status code of the request.'
         },
         'message': {
@@ -46,8 +46,8 @@ class SimpleResponseModel(Schema):
     required = ["status", "message"]
 
 
-simpleResponseExample = SimpleResponseModel(status=200, message="success")
-SimpleResponseModel.example = simpleResponseExample
+simpleResponseExample = SimpleStatusCodeResponseModel(status=200, message="success")
+SimpleStatusCodeResponseModel.example = simpleResponseExample
 
 
 class FileUploadResponseModel(Schema):

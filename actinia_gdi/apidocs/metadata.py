@@ -27,7 +27,7 @@ __license__ = "Apache-2.0"
 import os
 import json
 
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.model.responseModels import GeodataResponseModel
 
 
@@ -44,7 +44,7 @@ connection_get_docs = {
     "responses": {
         "200": {
             "description": "Success or failure of connection",
-            "schema": SimpleResponseModel
+            "schema": SimpleStatusCodeResponseModel
         }
     }
 }
@@ -58,7 +58,7 @@ connection_post_docs = {
     "responses": {
         "200": {
             "description": "Success or failure of connection",
-            "schema": SimpleResponseModel
+            "schema": SimpleStatusCodeResponseModel
         }
     }
 }

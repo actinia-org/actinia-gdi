@@ -35,7 +35,7 @@ from actinia_gdi.api.common import checkConnection
 from actinia_gdi.api.processes.processes import Job, JobHtml, JobId
 from actinia_gdi.core.actiniaCore import postActiniaCore
 from actinia_gdi.core.actiniaCore import shortenActiniaCoreResp
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.resources.logging import log
 
 
@@ -84,7 +84,7 @@ class JobTestWrapper(Job):
             resp = shortenActiniaCoreResp(fullResp)
 
             if resp is None or fullResp['status'] == 'error':
-                res = jsonify(SimpleResponseModel(
+                res = jsonify(SimpleStatusCodeResponseModel(
                     status=500,
                     message="failure"
                 ))
@@ -94,7 +94,7 @@ class JobTestWrapper(Job):
                 res.headers['Content-Type'] = 'application/json'
                 return res
         except Exception:
-            res = jsonify(SimpleResponseModel(status=500, message="failure"))
+            res = jsonify(SimpleStatusCodeResponseModel(status=500, message="failure"))
             return make_response(res, 500)
 
 

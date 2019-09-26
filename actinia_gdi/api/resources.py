@@ -30,7 +30,7 @@ from flask import make_response, jsonify, request
 from flask_restful import Resource
 
 # from actinia_gdi.apidocs.processes import processes
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.core.processes import updateJob
 from actinia_gdi.resources.logging import log
 
@@ -44,7 +44,7 @@ class Update(Resource):
     """
 
     def get(self):
-        res = jsonify(SimpleResponseModel(
+        res = jsonify(SimpleStatusCodeResponseModel(
             status=405,
             message="Method Not Allowed"
         ))
@@ -79,7 +79,7 @@ class Update(Resource):
         if job is not None:
             return make_response(jsonify(job), 200)
         else:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error'
                    )))

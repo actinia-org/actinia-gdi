@@ -29,7 +29,7 @@ from flask_restful import Resource
 from flask_restful_swagger_2 import swagger
 
 # from actinia_gdi.apidocs.processes import processes
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.core.processes import getAllJobIDs, getJobs
 from actinia_gdi.core.processes import createJob, getJob
 from actinia_gdi.core.processes import cancelJob
@@ -64,7 +64,7 @@ class JobHtml(Resource):
         ))
 
     def post(self):
-        res = jsonify(SimpleResponseModel(
+        res = jsonify(SimpleStatusCodeResponseModel(
             status=405,
             message="Method Not Allowed"
         ))
@@ -118,7 +118,7 @@ class Job(Resource):
         if job is not None:
             return make_response(jsonify(job), 201)
         else:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error'
                    )))
@@ -151,14 +151,14 @@ class JobId(Resource):
         if job is not None:
             return make_response(jsonify(job), 200)
         else:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Not Found: ' + request.url
                    )))
             return make_response(res, 404)
 
     def post(self):
-        res = jsonify(SimpleResponseModel(
+        res = jsonify(SimpleStatusCodeResponseModel(
             status=405,
             message="Method Not Allowed"
         ))
@@ -174,7 +174,7 @@ class JobIdCancel(Resource):
     """
 
     def get(self):
-        res = jsonify(SimpleResponseModel(
+        res = jsonify(SimpleStatusCodeResponseModel(
             status=405,
             message="Method Not Allowed"
         ))
@@ -199,7 +199,7 @@ class JobIdCancel(Resource):
         if job is not None:
             return make_response(jsonify(job), 200)
         else:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Not Found: ' + request.url
                    )))

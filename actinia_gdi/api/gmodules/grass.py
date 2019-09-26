@@ -36,7 +36,7 @@ from actinia_core.resources.resource_base import ResourceBase
 from actinia_gdi.apidocs import gmodules
 from actinia_gdi.core.gmodulesGrass import createModuleList, createGrassModule
 from actinia_gdi.model.gmodules import ModuleList
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 
 
 __license__ = "GPLv3"
@@ -77,7 +77,7 @@ class DescribeModule(ResourceBase):
             grass_module = createGrassModule(self, grassmodule)
             return make_response(jsonify(grass_module), 200)
         except Exception:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for module "' + grassmodule + '".'
             )))

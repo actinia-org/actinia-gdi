@@ -33,7 +33,7 @@ from flask_restful_swagger_2 import swagger
 
 from actinia_gdi.apidocs import metadata
 from actinia_gdi.api.common import checkConnection
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 from actinia_gdi.core.gnosReader import getRecordsByCategory
 from actinia_gdi.core.gnosReader import getRecordByUUID, getRecordsByTags
 from actinia_gdi.core.gnosReader import getMetaByUUID, getMetaByTags
@@ -74,7 +74,7 @@ class RawTags(Resource):
             res.headers['Content-Type'] = 'application/json'
             return res
         except Exception:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error looking for tags "' + tags + '".'
                    )))
@@ -103,7 +103,7 @@ class RawCat(Resource):
         #                          '".', 404)
         except Exception as e:
             log.error('ERROR: ' + repr(e) + " - " + str(e))
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Category "' + category + '" not found.'
                    )))
@@ -127,7 +127,7 @@ class RawUuid(Resource):
             res.headers['Content-Type'] = 'application/json'
             return res
         except Exception:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error looking for uuid "' + uuid + '".'
                    )))
@@ -150,7 +150,7 @@ class Tags(Resource):
             res.headers['Content-Type'] = 'application/json'
             return res
         except Exception:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error looking for tags "' + tags + '".'
                    )))
@@ -174,7 +174,7 @@ class Uuid(Resource):
             res.headers['Content-Type'] = 'application/json'
             return res
         except Exception:
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error looking for uuid "' + uuid + '".'
                    )))
@@ -202,7 +202,7 @@ class UpdateUuid(Resource):
         except Exception as e:
             log.error('error parsing gnos response')
             log.error(e)
-            res = (jsonify(SimpleResponseModel(
+            res = (jsonify(SimpleStatusCodeResponseModel(
                         status=404,
                         message='Error looking for uuid "' + uuid + '".'
                    )))

@@ -44,7 +44,7 @@ from actinia_core.resources.common.response_models import ProcessingResponseMode
 from actinia_gdi.core.gmodulesActinia import createProcessChainTemplateList
 from actinia_gdi.core.gmodulesActinia import fillTemplateFromProcessChain
 from actinia_gdi.core.gmodulesGrass import createModuleList
-from actinia_gdi.model.responseModels import SimpleResponseModel
+from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 
 
 __license__ = "GPLv3"
@@ -154,7 +154,7 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
                         new_pc.extend(module_pc)
                     else:
                         msg = "Module %s is not of type importer, exporter, grass-module or an actinia-module." % name
-                        return make_response(jsonify(SimpleResponseModel(
+                        return make_response(jsonify(SimpleStatusCodeResponseModel(
                             status="error",
                             message=msg
                         )), 409)
