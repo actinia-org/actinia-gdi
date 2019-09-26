@@ -32,6 +32,7 @@ from actinia_gdi.core.gmodulesProcessor import run_process_chain
 from actinia_gdi.core.gmodulesParser import ParseInterfaceDescription
 from actinia_gdi.model.gmodules import Module
 from actinia_gdi.resources.templating import pcTplEnv
+from actinia_gdi.resources.logging import log
 
 
 __license__ = "GPLv3"
@@ -68,6 +69,9 @@ def renderTemplate(pc):
 
 
 def createProcessChainTemplateList():
+    '''
+       list all stored templates and return as actinia-module list
+    '''
 
     pc_list = []
     tpl_list = pcTplEnv.list_templates(filter_func=filter_func)
@@ -92,9 +96,19 @@ def createProcessChainTemplateList():
 
 def createActiniaModule(self, processchain):
     '''
-       processchain is the name of the template that is requested
-       exec_process_chain is the pc that is created to request module
-       descriptions from within GRASS via actinia
+       In this method the terms "processchain" and "exec_process_chain" are
+       used. "processchain" is the name of the template for which the
+       description is requested, "exec_process_chain" is the pc that is created
+       to collect all module descriptions referenced in the template.
+
+       This method loads a stored process-chain template and for each GRASS
+       module that is found, it checks if one value contains a placeholder. If
+       this is the case and the name of the placeholder variable was not used by
+       another GRASS module already, a new exec_process_chain item is generated,
+       requesting the interface description from GRASS GIS. Then the whole
+       exec_process_chain with all interface descriptions is executed.
+       The response is parsed to show one actinia-module containing only the
+       attributes which can be replaced in the processchain template.
     '''
 
     pc_template = renderTemplate(processchain)
@@ -154,6 +168,12 @@ def createActiniaModule(self, processchain):
 
 
 def fillTemplateFromProcessChain(module):
+    """ This method receives a process chain for an actinia module and loads
+        the according process chain template. The received values will be
+        replaced to be passed to actinia. In case the template has more
+        placeholder values than it receives, the missing attribute is returned
+        as string.
+    """
 
     tpl_file = module["module"] + '.json'
     tpl_placeholder = renderTemplate(module["module"])
@@ -161,13 +181,22 @@ def fillTemplateFromProcessChain(module):
 
     kwargs = {}
 
-    for input in module['inputs']:
-        [module, param] = input['param'].split('_') # TODO if using id
-        val = input['value']
+    inOrOutputs = []
+
+    if module.get('inputs') is not None:
+        for item in module['inputs']:
+            inOrOutputs.append(item)
+    if module.get('outputs') is not None:
+        for item in module['output']:
+            inOrOutputs.append(item)
+
+    for item in inOrOutputs:
+        [module, param] = item['param'].split('_')  # TODO if using id
+        val = item['value']
         module_idx = -1
         for grass_module in tpllist:
             module_idx += 1
-            if module == grass_module['module']: # TODO if using id ('id')
+            if module == grass_module['module']:  # TODO if using id ('id')
                 param_id = -1
                 for grass_input in grass_module['inputs']:
                     param_id += 1
@@ -175,6 +204,16 @@ def fillTemplateFromProcessChain(module):
                         tplvar = tpllist[module_idx]['inputs'][param_id]['value']
                         var = tplvar.strip('{ }')
                         kwargs[var] = val
+
+    # find variables from processchain
+    tpl_source = pcTplEnv.loader.get_source(pcTplEnv, tpl_file)[0]
+    parsed_content = pcTplEnv.parse(tpl_source)
+    undef = meta.find_undeclared_variables(parsed_content)
+
+    for i in undef:
+        if i not in kwargs.keys():
+            log.error('Required parameter "' + i + '" not in process chain!')
+            return i
 
     tpl = pcTplEnv.get_template(tpl_file)
     pc_template = json.loads(tpl.render(**kwargs).replace('\n', ''))
