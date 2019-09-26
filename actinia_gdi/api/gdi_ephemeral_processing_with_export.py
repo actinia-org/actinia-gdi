@@ -151,7 +151,15 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
                         new_pc.append(module)
                     elif name in actinia_module_list:
                         module_pc = fillTemplateFromProcessChain(module)
-                        new_pc.extend(module_pc)
+                        if isinstance(module_pc, str):
+                            # then return value is a missing attribute
+                            msg = "Required parameter '%s' missing in Module '%s'." % (module_pc, name)
+                            return make_response(jsonify(SimpleResponseModel(
+                                status="error",
+                                message=msg
+                            )), 409)
+                        else:
+                            new_pc.extend(module_pc)
                     else:
                         msg = "Module %s is not of type importer, exporter, grass-module or an actinia-module." % name
                         return make_response(jsonify(SimpleStatusCodeResponseModel(
