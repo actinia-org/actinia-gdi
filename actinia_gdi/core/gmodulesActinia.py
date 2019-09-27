@@ -91,6 +91,19 @@ def createProcessChainTemplateList():
         ))
         pc_list.append(pc_response)
 
+    # add also actinia_core importer and exporter
+    for i in ["importer", "exporter"]:
+        tpl_id = i
+        description = "Import or export raster layer, vector layer or other file based data without calling a GRASS GIS module"
+        categories = ['actinia-module', i]
+
+        pc_response = (Module(
+            id=tpl_id,
+            description=description,
+            categories=categories
+        ))
+        pc_list.append(pc_response)
+
     return pc_list
 
 
