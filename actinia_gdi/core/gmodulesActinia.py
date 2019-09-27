@@ -91,24 +91,12 @@ def createProcessChainTemplateList():
         ))
         pc_list.append(pc_response)
 
-    # add also actinia_core importer and exporter
-    for i in ["importer", "exporter"]:
-        tpl_id = i
-        description = "Import or export raster layer, vector layer or other file based data without calling a GRASS GIS module"
-        categories = ['actinia-module', i]
-
-        pc_response = (Module(
-            id=tpl_id,
-            description=description,
-            categories=categories
-        ))
-        pc_list.append(pc_response)
-
     return pc_list
 
 
 def createActiniaModule(self, processchain):
     '''
+       This method is used to create self-descriptions for actinia-modules.
        In this method the terms "processchain" and "exec_process_chain" are
        used. "processchain" is the name of the template for which the
        description is requested, "exec_process_chain" is the pc that is created
@@ -154,21 +142,27 @@ def createActiniaModule(self, processchain):
                 aggregated_vals.append(val)
                 aggregated_keys.append(key)
 
-    response = run_process_chain(self, exec_process_chain)
-    xml_strings = response['process_log']
+    if exec_process_chain:
+        response = run_process_chain(self, exec_process_chain)
+        xml_strings = response['process_log']
 
-    grass_module_list = []
-    virtual_module_params = {}
+        grass_module_list = []
+        virtual_module_params = {}
 
-    for i in xml_strings:
-        xml_string = i['stdout']
-        grass_module = ParseInterfaceDescription(
-            xml_string,
-            keys=aggregated_keys
-        )
-        grass_module_list.append(grass_module)
-        for param in grass_module['parameters']:
-            virtual_module_params[param] = grass_module['parameters'][param]
+        for i in xml_strings:
+            xml_string = i['stdout']
+            grass_module = ParseInterfaceDescription(
+                xml_string,
+                keys=aggregated_keys
+            )
+            grass_module_list.append(grass_module)
+            for param in grass_module['parameters']:
+                virtual_module_params[param] = grass_module['parameters'][param]
+
+    else:
+        # case when actinia-modules are importer or exporter
+        # TODO: fill
+        virtual_module_params = {}
 
     virtual_module = Module(
         id=pc_template['id'],
