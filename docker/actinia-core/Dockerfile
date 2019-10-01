@@ -7,6 +7,10 @@ ARG SOURCE_GIT_REMOTE=mundialis
 ARG SOURCE_GIT_REPO=actinia-gdi
 ARG SOURCE_GIT_BRANCH=master
 
+# install importer and exporter modules (for ace) to use interface description
+RUN grass --tmp-location EPSG:4326 --exec g.extension -s url=https://github.com/mundialis/importer extension=importer && \
+grass --tmp-location EPSG:4326 --exec g.extension -s url=https://github.com/mundialis/exporter extension=exporter
+
 # Install actinia-gdi
 WORKDIR /src
 ADD https://api.github.com/repos/$SOURCE_GIT_REMOTE/$SOURCE_GIT_REPO/git/refs/heads/$SOURCE_GIT_BRANCH version.json
