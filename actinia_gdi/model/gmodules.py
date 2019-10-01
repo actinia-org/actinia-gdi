@@ -88,8 +88,23 @@ class ModuleParameter(Schema):
     required = ["description", "schema"]
 
 
-ModuleParameterOutput = copy.deepcopy(ModuleParameter)
-ModuleParameterOutput.description = "The data that is returned from this process."
+class ModuleReturns(ModuleParameter):
+    properties = ModuleParameter.properties
+    required = ModuleParameter.required
+    type = ModuleParameter.type
+    description = "The data that is returned from this process."
+
+class ModuleImportDescription(ModuleParameter):
+    properties = ModuleParameter.properties
+    required = ModuleParameter.required
+    type = ModuleParameter.type
+    description = "Import parameters to import data for this process."
+
+class ModuleExportDescription(ModuleParameter):
+    properties = ModuleParameter.properties
+    required = ModuleParameter.required
+    type = ModuleParameter.type
+    description = "Export parameters to export returned data from this process."
 
 
 class Module(Schema):
@@ -115,9 +130,9 @@ class Module(Schema):
             'description': 'A list of categories. GRASS GIS addons have the category "grass-module" and the actinia core modules are identified with "actinia-module"'
         },
         'parameters': ModuleParameter,
-        'returns': ModuleParameterOutput,
-        'import_descr': ModuleParameter,
-        'export': ModuleParameterOutput
+        'returns': ModuleReturns,
+        'import_descr': ModuleImportDescription,
+        'export': ModuleExportDescription
 
     }
     example = describemodule_get_docs_example
