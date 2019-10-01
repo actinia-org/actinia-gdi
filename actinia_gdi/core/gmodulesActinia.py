@@ -142,27 +142,21 @@ def createActiniaModule(self, processchain):
                 aggregated_vals.append(val)
                 aggregated_keys.append(key)
 
-    if exec_process_chain:
-        response = run_process_chain(self, exec_process_chain)
-        xml_strings = response['process_log']
+    response = run_process_chain(self, exec_process_chain)
+    xml_strings = response['process_log']
 
-        grass_module_list = []
-        virtual_module_params = {}
+    grass_module_list = []
+    virtual_module_params = {}
 
-        for i in xml_strings:
-            xml_string = i['stdout']
-            grass_module = ParseInterfaceDescription(
-                xml_string,
-                keys=aggregated_keys
-            )
-            grass_module_list.append(grass_module)
-            for param in grass_module['parameters']:
-                virtual_module_params[param] = grass_module['parameters'][param]
-
-    else:
-        # case when actinia-modules are importer or exporter
-        # TODO: fill
-        virtual_module_params = {}
+    for i in xml_strings:
+        xml_string = i['stdout']
+        grass_module = ParseInterfaceDescription(
+            xml_string,
+            keys=aggregated_keys
+        )
+        grass_module_list.append(grass_module)
+        for param in grass_module['parameters']:
+            virtual_module_params[param] = grass_module['parameters'][param]
 
     virtual_module = Module(
         id=pc_template['id'],

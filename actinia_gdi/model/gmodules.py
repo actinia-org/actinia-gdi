@@ -24,6 +24,7 @@ __copyright__ = "2019-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
+import copy
 import os
 import json
 
@@ -64,7 +65,7 @@ class ModuleParameterSchema(Schema):
             'description': ''
         }
     }
-    description: 'A schema object according to the specification of JSON Schema draft-07. Additional values for format are defined centrally in the API documentation, e.g. bbox or crs. Callback parameters are defined with the custom schema keyword parameters.'
+    description = 'A schema object according to the specification of JSON Schema draft-07. Additional values for format are defined centrally in the API documentation, e.g. bbox or crs. Callback parameters are defined with the custom schema keyword parameters.'
 
 
 class ModuleParameter(Schema):
@@ -83,8 +84,12 @@ class ModuleParameter(Schema):
         },
         'schema': ModuleParameterSchema
     }
-    description: 'A list of parameters that are applicable for this process.'
+    description = 'A list of parameters that are applicable for this process.'
     required = ["description", "schema"]
+
+
+ModuleParameterOutput = copy.deepcopy(ModuleParameter)
+ModuleParameterOutput.description = "The data that is returned from this process."
 
 
 class Module(Schema):
@@ -110,17 +115,9 @@ class Module(Schema):
             'description': 'A list of categories. GRASS GIS addons have the category "grass-module" and the actinia core modules are identified with "actinia-module"'
         },
         'parameters': ModuleParameter,
-        'returns': {
-            'type': 'object',
-            'description': 'The data that is returned from this process.',
-            'properties': {
-                'description': {
-                    'type': 'string',
-                    'description': 'Detailed description to fully explain the entity.'
-                }
-            }
-
-        }
+        'returns': ModuleParameterOutput,
+        'import_descr': ModuleParameter,
+        'export': ModuleParameterOutput
 
     }
     example = describemodule_get_docs_example

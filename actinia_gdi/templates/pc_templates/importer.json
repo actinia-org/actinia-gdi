@@ -1,7 +1,0 @@
-{
-    "id": "importer",
-    "description": "Import raster layer, vector layer or other file based data without calling a GRASS GIS module",
-    "template": {
-        "list": []
-    }
-}
