@@ -1,0 +1,48 @@
+{
+    "export": {
+        "format": {
+            "description": "The format of the output file",
+            "required": true,
+            "schema": {
+                "enum": [
+                    "GTiff",
+                    "GPKG",
+                    "SQLite",
+                    "GML",
+                    "GeoJSON",
+                    "ESRI_Shapefile",
+                    "CSV",
+                    "TXT",
+                    "PostgreSQL"
+                ],
+                "type": "string"
+            }
+        },
+        "type": {
+            "description": "The type of the output",
+            "required": true,
+            "schema": {
+                "enum": [
+                    "raster",
+                    "vector",
+                    "file"
+                ],
+                "type": "string"
+            }
+        },
+        "dbstring": {
+            "description": "The database string to be used to connect to a PostgreSQL database for vector export.",
+            "required": false,
+            "schema": {
+                "type": "string"
+            }
+        },
+        "output_layer": {
+            "description": "Name for output PostgreSQL layer.",
+            "required": false,
+            "schema": {
+                "type": "string"
+            }
+        }
+    }
+}

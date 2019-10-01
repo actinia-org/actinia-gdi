@@ -25,11 +25,13 @@
 Module management to parser GRASS xml response
 
 """
+import json
 import xmltodict
 
 from actinia_gdi.model.gmodules import Module
 from actinia_gdi.model.gmodules import ModuleParameter, ModuleParameterSchema
 from actinia_gdi.resources.logging import log
+from actinia_gdi.resources.templating import tplEnv
 
 
 __license__ = "GPLv3"
@@ -148,7 +150,7 @@ def setParameterEnum(parameter, schema_kwargs):
 
 def isOutput(parameter):
     """ Checks if parameter is output parameter.
-    Returns True if parameter has key 
+    Returns True if parameter has key
     'gisprompt.age' == 'new',
     False otherwise.
     """
@@ -174,6 +176,7 @@ def ParseInterfaceDescription(xml_string, keys=None):
     categories.append('grass-module')
     parameters = {}
     returns = {}
+    extrakwargs = dict()
 
     try:
         grass_params = gm_dict['parameter']
@@ -239,12 +242,24 @@ def ParseInterfaceDescription(xml_string, keys=None):
         del kwargs
         del schema_kwargs
 
+    # custom extention for importer + exporter from actinia_core
+    try:
+        tpl = tplEnv.get_template('gmodules/' + module_id + '.json')
+        pc_template = json.loads(tpl.render().replace('\n', ''))
+        for key in [*pc_template]:
+            extrakwargs[key] = {}
+            for param in pc_template[key]:
+                extrakwargs[key][param] = ModuleParameter(**pc_template[key][param])
+    except Exception as e:
+        log.debug(e)
+
     grass_module = Module(
         id=module_id,
         description=description,
         categories=sorted(categories),
         parameters=parameters,
-        returns=returns
+        returns=returns,
+        **extrakwargs
     )
 
     return grass_module
