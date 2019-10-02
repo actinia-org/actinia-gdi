@@ -10,6 +10,7 @@ Content:
 1. Module self-description
 1. Process-chain templates
 1. Template self-description
+1. Hints for template creation
 1. Conventions for template creation
 1. Overview of endpoints for self-description
 
@@ -434,10 +435,19 @@ Mapping the process-chain template to a self-description will look as follows an
 
 
 ```
-### 4. Conventions for template creation
+### 4. Hints for template creation
+
+
+* __It is not allowed to manipulate existing maps__
+This leads to an error for ephemeral and persistent processing. E.g. `v.db.addcolumn` is not working and leads to `"ERROR: Vector map <elev_points> not found in current mapset"`. Therefore copy it first (in the same processchain!) with g.copy. If it is done in a separate process chain and even exists in the user mapset, it is still not working.
+
+* __Map search order__
+On persistent processing, name of map will be first searched in PERSISTENT mapset, then in user mapset. If both exist and user mapset should be used, this can be overwritten by mymap@mymapset.
+
+
+### 5. Conventions for template creation
 
 * __Only use placeholder for a whole value of a GRASS GIS attribute.__
-
 
 * __Do not use placeholder for only part of a value of a GRASS GIS attribute.__
 E.g. not like this:
@@ -445,15 +455,22 @@ E.g. not like this:
 As the self-desription will display the data type of the whole parameter, placeholder of only one part of the value could lead to weird results.
 Exceptions might be ok for filesystem-paths. TODO discuss.
 
-
 * __Make use of importer and exporter where possible, especially for Landsat / Sentinel data.__
 Both are special modules from actinia-core. Safety mechanisms are already implemented and optimized, e.g. clean up of download cache from node / feature to block download if it threatenes health of node...
 
 
+#### Conventions to be disucssed
+
+* __If data should be imported or exported, do not do this in template but leave to importer / exporter module for user__
+TODO discuss
+
+* __To be able to use all templates either for ephemeral or for persistent processing, always define an export.__
+TODO discuss
 
 
 
-### 5. Overview of endpoints for self-description
+
+### 5. Overview of endpoints for module self-description and execution
 
 List / Describe only GRASS Modules
 
@@ -473,6 +490,11 @@ List / Describe combined
 * GET /modules/vector_area
 * GET /modules/vector_area5
 
+Execute module
+
+* POST /locations/{location_name}/gdi_processing_async_export
+* POST /locations/{location_name}/mapsets/{mapset_name}/gdi_processing_async (TODO)
+
 Full API docs
 
 * GET /swagger.json
@@ -481,7 +503,7 @@ Full API docs
 
 ### 6. Additional Notes
 
-The self-description tries to comply the [openEO API](https://open-eo.github.io/openeo-api/apireference/#tag/Process-Discovery/paths/~1processes/get) where applicable.
+#### The self-description tries to comply the [openEO API](https://open-eo.github.io/openeo-api/apireference/#tag/Process-Discovery/paths/~1processes/get) where applicable.
 At some points, however, we have to divert from their API:
 
 * `returns` section may contain multiple outputs and has the same structure
@@ -489,3 +511,7 @@ as the `parameters` sections.
 
 A parameter will only be added to the `returns` section if it contains the property `gisprompt.@age` and only if that value equals `'new'`. In all other cases, the parameter will be added to the `parameters` section.
 
+* the importer and exporter modules have additional attributes (import_descr / export)
+
+#### Importer and exporter
+These are neiher fully grass-modules nor fully actinia-modules. They need to be added to GRASS GIS with g.extension (originally for ace usage) but are extended by actinia-gdi. The GRASS interface description does not describe import_descr and export as seen in API docs, so this is extended. It is possible to extend all GRASS modules by importer/exporter attributes if applicable (e.g. output of v.buffer can directly be exported with "export" attribute inside module)
