@@ -251,7 +251,8 @@ def ParseInterfaceDescription(xml_string, keys=None):
             for param in pc_template[key]:
                 extrakwargs[key][param] = ModuleParameter(**pc_template[key][param])
     except Exception as e:
-        log.debug(e)
+        # if no template for module exist, use as is (default)
+        log.debug('template %s does not exist.', e)
 
     grass_module = Module(
         id=module_id,
