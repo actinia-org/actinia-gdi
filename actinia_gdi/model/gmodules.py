@@ -83,6 +83,10 @@ class ModuleParameter(Schema):
             'description': 'Determines whether this parameter is mandatory. Default: false'
         },
         'schema': ModuleParameterSchema
+        # 'comment': {
+        #     'type': 'string',
+        #     'description': 'Comment for parameter.'
+        # }
     }
     description = 'A list of parameters that are applicable for this process.'
     required = ["description", "schema"]

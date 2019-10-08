@@ -38,13 +38,12 @@ from actinia_core.resources.common.redis_interface import enqueue_job
 from actinia_core.resources.common.process_object import Process
 from actinia_core.resources.common.process_chain import ProcessChainModel
 from actinia_core.resources.common.exceptions import AsyncProcessTermination
-from actinia_core.resources.common.response_models import ProcessingResponseModel, ProcessingErrorResponseModel
+from actinia_core.resources.common.response_models import ProcessingResponseModel, ProcessingErrorResponseModel, SimpleResponseModel
 
 # from actinia_gdi.api.gmodules.grass import ListModules
 from actinia_gdi.core.gmodulesActinia import createProcessChainTemplateList
 from actinia_gdi.core.gmodulesActinia import fillTemplateFromProcessChain
 from actinia_gdi.core.gmodulesGrass import createModuleList
-from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
 
 
 __license__ = "GPLv3"
@@ -157,21 +156,21 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
                             return make_response(jsonify(SimpleResponseModel(
                                 status="error",
                                 message=msg
-                            )), 409)
+                            )), 400)
                         elif module_pc is None:
                             msg = "Invalid request for %s" % (name)
                             return make_response(jsonify(SimpleResponseModel(
                                 status="error",
                                 message=msg
-                            )), 409)
+                            )), 400)
                         else:
                             new_pc.extend(module_pc)
                     else:
                         msg = "Module %s is not of type importer, exporter, grass-module or an actinia-module." % name
-                        return make_response(jsonify(SimpleStatusCodeResponseModel(
+                        return make_response(jsonify(SimpleResponseModel(
                             status="error",
                             message=msg
-                        )), 409)
+                        )), 400)
                 else:
                     new_pc.append(module)
 

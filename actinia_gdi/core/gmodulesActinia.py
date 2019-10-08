@@ -119,12 +119,16 @@ def createActiniaModule(self, processchain):
     exec_process_chain = dict()
     aggregated_keys = []
     aggregated_vals = []
+    input_dict = {}
 
     for i in processes:
 
         # create the exec_process_chain item
         module = i['module']
         id = i['id']
+        # TODO: display this in module description?
+        # if hasattr(i, 'comment'):
+        #     comment = i['comment']
         item_key = str(count)
         pc_item = {item_key: {"module": module,
                               "interface-description": True}}
@@ -137,10 +141,16 @@ def createActiniaModule(self, processchain):
         inputs = i['inputs']
         for j in inputs:
             val = j['value']
-            key = module + '_' + j['param'] # TODO id
+            key = module + '_' + j['param']
             if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
                 aggregated_vals.append(val)
                 aggregated_keys.append(key)
+                input_dict[key] = {}
+                amkey = val.strip('{{').strip('}}').strip(' ')
+                input_dict[key]['amkey'] = amkey
+                if 'comment' in j:
+                    input_dict[key]['comment'] = j['comment']
+
 
     response = run_process_chain(self, exec_process_chain)
     xml_strings = response['process_log']
@@ -156,7 +166,16 @@ def createActiniaModule(self, processchain):
         )
         grass_module_list.append(grass_module)
         for param in grass_module['parameters']:
-            virtual_module_params[param] = grass_module['parameters'][param]
+            amkey = input_dict[param]['amkey']
+            virtual_module_params[amkey] = grass_module['parameters'][param]
+            # update description and mention grass module parameter
+            suffix = " [generated from " + param + "]"
+            virtual_module_params[amkey]['description'] += suffix
+            # add comment if there is one in process chain template
+            if 'comment' in input_dict[param]:
+                comment = input_dict[param]['comment']
+                virtual_module_params[amkey]['description'] += " - " + comment
+                # virtual_module_params[amkey]['comment'] = comment
 
     virtual_module = Module(
         id=pc_template['id'],
@@ -175,38 +194,23 @@ def fillTemplateFromProcessChain(module):
         placeholder values than it receives, the missing attribute is returned
         as string.
     """
-
-    tpl_file = module["module"] + '.json'
-    tpl_placeholder = renderTemplate(module["module"])
-    tpllist = tpl_placeholder['template']['list']
-
     kwargs = {}
-
     inOrOutputs = []
 
     if module.get('inputs') is not None:
-        for item in module['inputs']:
-            inOrOutputs.append(item)
+        inOrOutputs += module.get('inputs')
+
     if module.get('outputs') is not None:
-        for item in module['output']:
-            inOrOutputs.append(item)
+        inOrOutputs += module.get('outputs')
 
     for item in inOrOutputs:
         if (item.get('param') is None) or (item.get('value') is None):
             return None
-        [module, param] = item['param'].split('_')  # TODO if using id
+        key = item['param']
         val = item['value']
-        module_idx = -1
-        for grass_module in tpllist:
-            module_idx += 1
-            if module == grass_module['module']:  # TODO if using id ('id')
-                param_id = -1
-                for grass_input in grass_module['inputs']:
-                    param_id += 1
-                    if param == grass_input['param']:
-                        tplvar = tpllist[module_idx]['inputs'][param_id]['value']
-                        var = tplvar.strip('{ }')
-                        kwargs[var] = val
+        kwargs[key] = val
+
+    tpl_file = module["module"] + '.json'
 
     # find variables from processchain
     tpl_source = pcTplEnv.loader.get_source(pcTplEnv, tpl_file)[0]
@@ -218,6 +222,7 @@ def fillTemplateFromProcessChain(module):
             log.error('Required parameter "' + i + '" not in process chain!')
             return i
 
+    # fill process chain template
     tpl = pcTplEnv.get_template(tpl_file)
     pc_template = json.loads(tpl.render(**kwargs).replace('\n', ''))
 
