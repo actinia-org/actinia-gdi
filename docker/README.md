@@ -9,11 +9,27 @@ Depending on how you run, it, actinia-gdi has different endpoints as some make o
 # As actinia-core plugin
 
 To run actinia-gdi with actinia-core, run
+
 ```
 docker-compose --file docker/docker-compose-plugin.yml build
 docker-compose --file docker/docker-compose-plugin.yml up
-# if a redis db is running locally this will fail. Run /etc/init.d/redis-server stop and try again
 ```
+
+To fix common startup errors:
+* if a redis db is running locally this will fail. Run and try again:
+```
+/etc/init.d/redis-server stop
+```
+* if elasticsearch is shutting down immediately, check logs with
+```
+docker logs docker_elasticsearch_1
+```
+  if you see an error like "max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]", run
+```
+sudo sysctl -w vm.max_map_count=262144
+```
+  this is only valid on runtime. To change permanently, set vm.max_map_count in /etc/sysctl.conf
+
 
 To run actinia-gdi with actinia-core only based on ready-to-use images, run
 ```
@@ -76,6 +92,7 @@ cd -
 grass /actinia_core/grassdb/nc_spm_08/PERMANENT
 ```
 
+To reach kibana (only setup in docker-compose-plugin.yml), open http://127.0.0.1:5601 in your browser.
 
 
 

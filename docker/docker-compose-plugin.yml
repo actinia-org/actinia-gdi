@@ -18,6 +18,9 @@ services:
       - 8088
     depends_on:
       - redis
+      - fluentd
+      - elasticsearch
+      - kibana
 
   redis:
     image: redis:5.0.4-alpine
@@ -35,3 +38,26 @@ services:
     ]
     ports:
       - 6379:6379
+
+  fluentd:
+    build:
+      context: fluentd
+    image: fluentd
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    expose:
+      - 24224
+
+  elasticsearch:
+    image:  elasticsearch:7.4.0
+    environment:
+    - discovery.type=single-node
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  kibana:
+    image: kibana:7.4.0
+    ports:
+      - "5601:5601"
