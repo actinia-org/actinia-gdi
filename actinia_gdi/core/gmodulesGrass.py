@@ -26,6 +26,10 @@ Module management related to GRASS modules
 
 """
 import json
+import time
+
+from actinia_core.resources.common.response_models import create_response_from_model
+
 from actinia_gdi.core.gmodulesProcessor import run_process_chain
 from actinia_gdi.core.gmodulesParser import ParseInterfaceDescription
 from actinia_gdi.model.gmodules import Module
@@ -42,9 +46,23 @@ def createModuleList(self):
     process_chain = {"1": {"module": "g.search.modules",
                            "inputs": {"keyword": ""},
                            "flags": "j"}}
+
     response = run_process_chain(self, process_chain)
 
     j_data = json.loads(response['process_log'][-1]['stdout'])
+
+    # overwrite previous entries commited by EphemeralModuleLister in case the
+    # further processing fails (e.g. invalid json). Else, the resource exists
+    # and shows the output of g.search.models.
+    data = create_response_from_model(
+        user_id=self.user_id,
+        resource_id=self.resource_id,
+        status='',
+        orig_time=time.time(),
+        orig_datetime='',
+        message=''
+    )
+    self.resource_logger.commit(user_id=self.user_id, resource_id=self.resource_id, document=data,expiration=1)
 
     module_list = []
     for data in j_data:
