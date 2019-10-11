@@ -32,7 +32,10 @@ from flask_restful_swagger_2 import swagger
 from actinia_core.resources.resource_base import ResourceBase
 from actinia_core.resources.common.redis_interface import enqueue_job
 from actinia_core.resources.common.response_models import SimpleResponseModel
-from actinia_core.resources.ephemeral_processing_with_export import EphemeralProcessingWithExport, start_job, SCHEMA_DOC
+from actinia_core.resources.ephemeral_processing_with_export import start_job, SCHEMA_DOC
+
+from actinia_core.resources.persistent_processing import AsyncPersistentResource, start_job as start_job_persistent
+
 
 from actinia_gdi.core.gmodulesActinia import createProcessChainTemplateList
 from actinia_gdi.core.gmodulesActinia import fillTemplateFromProcessChain
@@ -112,6 +115,76 @@ class GdiAsyncEphemeralExportResource(ResourceBase):
             rdc.request_data['list'] = new_pc
 
             enqueue_job(self.job_timeout, start_job, rdc)
+
+        html_code, response_model = pickle.loads(self.response_data)
+        return make_response(jsonify(response_model), html_code)
+
+
+class GdiAsyncPersistentResource(ResourceBase):
+    def __init__(self):
+        ResourceBase.__init__(self)
+
+    def post(self, location_name, mapset_name):
+        """Execute a user defined process chain in an ephemeral location/mapset and store the processing results
+        for download.
+        """
+
+        import pdb; pdb.set_trace()
+        # get grass and actinia module lists
+        module_list = createModuleList(self)
+        pc_list = createProcessChainTemplateList()
+        # TODO: find out size before ?
+        grass_module_list = []
+        actinia_module_list = []
+
+        for module in module_list:
+            grass_module_list.append(module['id'])
+
+        for module in pc_list:
+            actinia_module_list.append(module['id'])
+
+        rdc = self.preprocess(has_json=True, location_name=location_name, mapset_name=mapset_name)
+
+        if rdc:
+            rdc.set_storage_model_to_file()
+
+            new_pc = []
+            for module in rdc.request_data['list']:
+                if "module" in module:
+                    name = module["module"]
+                    if name == "importer" or name == "exporter":
+                        new_pc.append(module)
+                    elif name in grass_module_list:
+                        new_pc.append(module)
+                    elif name in actinia_module_list:
+                        module_pc = fillTemplateFromProcessChain(module)
+                        if isinstance(module_pc, str):
+                            # then return value is a missing attribute
+                            msg = "Required parameter '%s' missing in Module '%s'." % (module_pc, name)
+                            return make_response(jsonify(SimpleResponseModel(
+                                status="error",
+                                message=msg
+                            )), 400)
+                        elif module_pc is None:
+                            msg = "Invalid request for %s" % (name)
+                            return make_response(jsonify(SimpleResponseModel(
+                                status="error",
+                                message=msg
+                            )), 400)
+                        else:
+                            new_pc.extend(module_pc)
+                    else:
+                        msg = "Module %s is not of type importer, exporter, grass-module or an actinia-module." % name
+                        return make_response(jsonify(SimpleResponseModel(
+                            status="error",
+                            message=msg
+                        )), 400)
+                else:
+                    new_pc.append(module)
+
+            rdc.request_data['list'] = new_pc
+
+            enqueue_job(self.job_timeout, start_job_persistent, rdc)
 
         html_code, response_model = pickle.loads(self.response_data)
         return make_response(jsonify(response_model), html_code)

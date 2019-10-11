@@ -50,7 +50,7 @@ def create_endpoints(flask_api):
     from actinia_gdi.api.gmodules.combined import DescribeVirtualModule
 
     from actinia_gdi.api.gdi_ephemeral_processing_with_export import \
-        GdiAsyncEphemeralExportResource
+        GdiAsyncEphemeralExportResource, GdiAsyncPersistentResource
 
     app = flask_api.app
     apidoc = flask_api
@@ -95,6 +95,11 @@ def create_endpoints(flask_api):
     apidoc.add_resource(
         GdiAsyncEphemeralExportResource,
         '/locations/<string:location_name>/gdi_processing_async_export'
+    )
+
+    apidoc.add_resource(
+        GdiAsyncPersistentResource,
+        '/locations/<string:location_name>/mapsets/<string:mapset_name>/gdi_processing_async'
     )
 
 
