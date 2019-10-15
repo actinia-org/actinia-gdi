@@ -53,7 +53,7 @@ def createModuleList(self):
 
     # overwrite previous entries commited by EphemeralModuleLister in case the
     # further processing fails (e.g. invalid json). Else, the resource exists
-    # and shows the output of g.search.models.
+    # and shows the output of g.search.modules.
     data = create_response_from_model(
         user_id=self.user_id,
         resource_id=self.resource_id,
