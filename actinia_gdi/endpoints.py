@@ -49,7 +49,7 @@ def create_endpoints(flask_api):
     from actinia_gdi.api.gmodules.combined import ListVirtualModules
     from actinia_gdi.api.gmodules.combined import DescribeVirtualModule
 
-    from actinia_gdi.api.gdi_ephemeral_processing_with_export import \
+    from actinia_gdi.api.gdi_processing import \
         GdiAsyncEphemeralExportResource, GdiAsyncPersistentResource
 
     app = flask_api.app
