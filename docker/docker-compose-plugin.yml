@@ -3,7 +3,8 @@ services:
 
   actinia-core:
     build:
-      context: actinia-core
+      context: ../.
+      dockerfile: docker/actinia-core/Dockerfile
     image: actinia-core-gdi:latest
     volumes:
       - ./actinia-core-data/grassdb:/actinia_core/grassdb:Z
