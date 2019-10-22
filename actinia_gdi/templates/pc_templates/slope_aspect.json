@@ -1,0 +1,79 @@
+{
+	"id": "slope_aspect",
+	"description": "Calculates slope and aspect of elevation map.",
+	"template": {
+		"version": "1",
+		"list": [
+			{
+				"module": "g.region",
+				"id": "g.region_1804289383",
+				"flags": "p",
+				"inputs": [
+					{
+						"param": "raster",
+						"value": "elevation@PERMANENT"
+					},
+					{
+						"param": "res",
+						"value": "10"
+					}
+				]
+			},
+			{
+				"module": "r.slope.aspect",
+				"id": "r.slope.aspect_1804289383",
+				"flags": "a",
+				"inputs": [
+					{
+						"param": "elevation",
+						"value": "elevation@PERMANENT"
+					},
+					{
+						"param": "format",
+						"value": "degrees"
+					},
+					{
+						"param": "precision",
+						"value": "{{ datatype }}"
+					},
+					{
+						"param": "zscale",
+						"value": "1.0"
+					},
+					{
+						"param": "min_slope",
+						"value": "0.0"
+					}
+				],
+				"outputs": [
+					{
+						"param": "slope",
+						"value": "{{ name_of_output_slope }}"
+					},
+					{
+						"param": "aspect",
+						"value": "{{ name_of_output_aspect }}",
+						"export": {
+							"format": "GTiff",
+							"type": "raster"
+						}
+					}
+				]
+			},
+			{
+				"module": "exporter",
+				"id": "exporter",
+				"outputs":[
+					{
+						"param": "raster",
+						"value": "{{ name_of_output_slope }}",
+						"export": {
+							"format": "GTiff",
+							"type": "raster"
+						}
+					}
+				]
+			}
+		]
+	}
+}

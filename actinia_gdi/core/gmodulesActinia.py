@@ -94,6 +94,19 @@ def createProcessChainTemplateList():
     return pc_list
 
 
+def add_param_description(moduleparameter, param, input_dict):
+
+    # update description and mention grass module parameter
+    suffix = " [generated from " + param + "]"
+    moduleparameter['description'] += suffix
+    # add comment if there is one in process chain template
+
+    if param in input_dict and 'comment' in input_dict[param]:
+        comment = input_dict[param]['comment']
+        moduleparameter['description'] += " - " + comment
+        # moduleparameter['comment'] = comment
+
+
 def createActiniaModule(self, processchain):
     '''
        This method is used to create self-descriptions for actinia-modules.
@@ -120,6 +133,8 @@ def createActiniaModule(self, processchain):
     aggregated_keys = []
     aggregated_vals = []
     input_dict = {}
+    import_descr_dict = {}
+    exporter_dict = {}
 
     for i in processes:
 
@@ -132,14 +147,19 @@ def createActiniaModule(self, processchain):
         item_key = str(count)
         pc_item = {item_key: {"module": module,
                               "interface-description": True}}
+        # TODO: only request modules where placeholder is used
         exec_process_chain.update(pc_item)
         count = count + 1
 
         # aggregate all keys where values are a variable
         # in the processchain template
         # only aggregate them if the template value differs
-        inputs = i['inputs']
-        for j in inputs:
+        inOrOutputs = []
+        if i.get('inputs') is not None:
+            inOrOutputs += i.get('inputs')
+        if i.get('outputs') is not None:
+            inOrOutputs += i.get('outputs')
+        for j in inOrOutputs:
             val = j['value']
             key = module + '_' + j['param']
             if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
@@ -151,12 +171,24 @@ def createActiniaModule(self, processchain):
                 if 'comment' in j:
                     input_dict[key]['comment'] = j['comment']
 
+            if 'import_descr' in j:
+                for key, val in j['import_descr'].items():
+                    if '{{ ' in val and ' }}' in val:
+                        stripval = val.strip('{{').strip('}}').strip(' ')
+                        import_descr_dict[stripval] = key
+
+            if 'exporter' in j:
+                for key, val in j['exporter'].items():
+                    if '{{ ' in val and ' }}' in val:
+                        stripval = val.strip('{{').strip('}}').strip(' ')
+                        exporter_dict[stripval] = key
 
     response = run_process_chain(self, exec_process_chain)
     xml_strings = response['process_log']
 
     grass_module_list = []
     virtual_module_params = {}
+    virtual_module_returns = {}
 
     for i in xml_strings:
         xml_string = i['stdout']
@@ -165,23 +197,48 @@ def createActiniaModule(self, processchain):
             keys=aggregated_keys
         )
         grass_module_list.append(grass_module)
-        for param in grass_module['parameters']:
-            amkey = input_dict[param]['amkey']
-            virtual_module_params[amkey] = grass_module['parameters'][param]
-            # update description and mention grass module parameter
-            suffix = " [generated from " + param + "]"
-            virtual_module_params[amkey]['description'] += suffix
-            # add comment if there is one in process chain template
-            if 'comment' in input_dict[param]:
-                comment = input_dict[param]['comment']
-                virtual_module_params[amkey]['description'] += " - " + comment
-                # virtual_module_params[amkey]['comment'] = comment
+        if 'parameters' in grass_module:
+            for param in grass_module['parameters']:
+                if param in input_dict:
+                    amkey = input_dict[param]['amkey']
+                    virtual_module_params[amkey] = grass_module['parameters'][param]
+
+                    add_param_description(
+                        virtual_module_params[amkey], param, input_dict)
+
+        if 'returns' in grass_module:
+            for param in grass_module['returns']:
+                if param in input_dict:
+                    amkey = input_dict[param]['amkey']
+                    virtual_module_returns[amkey] = grass_module['returns'][param]
+
+                    add_param_description(
+                        virtual_module_returns[amkey], param, input_dict)
+
+        if 'import_descr' in grass_module:
+            for param in grass_module['import_descr']:
+                for key, val in import_descr_dict.items():
+                    if param == val:
+                        virtual_module_params[key] = grass_module['import_descr'][val]
+
+                        add_param_description(
+                            virtual_module_params[key], 'import_descr_' + param, import_descr_dict)
+
+        if 'exporter' in grass_module:
+            for param in grass_module['exporter']:
+                for key, val in exporter_dict.items():
+                    if param == val:
+                        virtual_module_returns[key] = grass_module['exporter'][val]
+
+                        add_param_description(
+                            virtual_module_returns[key], 'exporter' + param, exporter_dict)
 
     virtual_module = Module(
         id=pc_template['id'],
         description=pc_template['description'],
         categories=['actinia-module'],
-        parameters=virtual_module_params
+        parameters=virtual_module_params,
+        returns=virtual_module_returns
     )
 
     return virtual_module
