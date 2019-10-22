@@ -76,10 +76,10 @@ def log_error_to_resource_logger(self, msg, rdc):
 
 
 def preprocess_build_pc_and_enqueue(self, preprocess_kwargs, start_job):
-    """ This method looks up grass module and actinia module lists to parse the
-    incoming process chain. If an actinia-module is found, it is translated to
-    a process chain via the stored template. The process chain is then passed
-    to actinia-core.
+    """ This method looks up the lists of GRASS GIS and actinia modules to
+    parse the incoming process chain. If an actinia-module is found, it is
+    translated to a process chain via the stored template. The process chain is
+    then passed to actinia-core.
     """
 
     # get grass and actinia module lists
@@ -112,7 +112,7 @@ def preprocess_build_pc_and_enqueue(self, preprocess_kwargs, start_job):
                     module_pc = fillTemplateFromProcessChain(module)
                     if isinstance(module_pc, str):
                         # then return value is a missing attribute
-                        msg = ("Required parameter '%s' missing in Module "
+                        msg = ("Required parameter '%s' missing in actinia-module "
                                " '%s'." % (module_pc, name))
                         log_error_to_resource_logger(self, msg, rdc)
                         return
