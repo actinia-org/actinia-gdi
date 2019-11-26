@@ -1,6 +1,4 @@
-FROM mundialis/actinia-core:latest
-
-ENV SETUPTOOLS_SCM_PRETEND_VERSION=0.1
+FROM mundialis/actinia-core:0.99
 
 # install importer and exporter modules (for ace) to use interface description
 RUN grass --tmp-location EPSG:4326 --exec g.extension -s url=https://github.com/mundialis/importer extension=importer && \
