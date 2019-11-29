@@ -196,10 +196,12 @@ def ParseInterfaceDescription(xml_string, keys=None):
         schema_kwargs = dict()
 
         if keys:
+            # case for actinia modules
             key = setVirtualParameterKey(module_id, parameter)
             if key not in keys:
                 continue
         else:
+            # case for GRASS modules
             key = setParameterKey(module_id, parameter)
 
         schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
