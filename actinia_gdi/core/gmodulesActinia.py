@@ -27,6 +27,7 @@ Module management related to process chain templates
 """
 import json
 from jinja2 import meta
+import re
 
 from actinia_gdi.core.gmodulesProcessor import run_process_chain
 from actinia_gdi.core.gmodulesParser import ParseInterfaceDescription
@@ -128,88 +129,104 @@ def createActiniaModule(self, processchain):
     pc_template = renderTemplate(processchain)
     processes = pc_template['template']['list']
 
-    count = 1
-    exec_process_chain = dict()
-    aggregated_keys = []
     aggregated_vals = []
     input_dict = {}
     import_descr_dict = {}
     exporter_dict = {}
+    count = 1
 
     for i in processes:
 
         # create the exec_process_chain item
         module = i['module']
-        id = i['id']
+        processid = i['id']
         # TODO: display this in module description?
         # if hasattr(i, 'comment'):
         #     comment = i['comment']
-        item_key = str(count)
-        pc_item = {item_key: {"module": module,
-                              "interface-description": True}}
-        # TODO: only request modules where placeholder is used
-        exec_process_chain.update(pc_item)
-        count = count + 1
 
-        # aggregate all keys where values are a variable
-        # in the processchain template
-        # only aggregate them if the template value differs
         inOrOutputs = []
         if i.get('inputs') is not None:
             inOrOutputs += i.get('inputs')
         if i.get('outputs') is not None:
             inOrOutputs += i.get('outputs')
+
+        run_interface_descr = False
+        input_dict[processid] = {}
+        input_dict[processid]["gparams"] = {}
+
+        # aggregate all keys where values are a variable
+        # in the processchain template
+        # only aggregate them if the template value differs
         for j in inOrOutputs:
             val = j['value']
             key = module + '_' + j['param']
+            uuid = processid + '_' + j['param']
             if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
                 aggregated_vals.append(val)
-                aggregated_keys.append(key)
-                input_dict[key] = {}
-                amkey = val.strip('{{').strip('}}').strip(' ')
-                input_dict[key]['amkey'] = amkey
+                run_interface_descr = True
+                input_dict[processid]["gparams"][key] = {}
+
+                # matches placeholder in longer value, e.g. in
+                # 'res = if(input <= {{ my_values }}, 1, null() )'
+                # beware that in general it is easier to make the whole value
+                # a placeholder. Might be not possible for e.g. r.mapcalc
+                placeholder = re.search(r"\{\{(.*?)\}\}", str(val)).groups()[0]
+                amkey = placeholder.strip(' ')
+                input_dict[processid]["gparams"][key]['amkey'] = amkey
                 if 'comment' in j:
-                    input_dict[key]['comment'] = j['comment']
+                    input_dict[processid]["gparams"][key]['comment'] = j['comment']
 
             if 'import_descr' in j:
                 for key, val in j['import_descr'].items():
                     if '{{ ' in val and ' }}' in val:
+                        run_interface_descr = True
+                        # TODO: check if only part of value can be placeholder
                         stripval = val.strip('{{').strip('}}').strip(' ')
                         import_descr_dict[stripval] = key
 
             if 'exporter' in j:
                 for key, val in j['exporter'].items():
                     if '{{ ' in val and ' }}' in val:
+                        run_interface_descr = True
+                        # TODO: check if only part of value can be placeholder
                         stripval = val.strip('{{').strip('}}').strip(' ')
                         exporter_dict[stripval] = key
 
-    response = run_process_chain(self, exec_process_chain)
-    xml_strings = response['process_log']
+        if run_interface_descr:
+            item_key = str(count)
+            pc_item = {item_key: {"module": module,
+                                  "interface-description": True}}
+            response = run_process_chain(self, pc_item)
+            xml_strings = response['process_log']
+            count = count + 1
+            input_dict[processid]['xml_string'] = xml_strings[0]['stdout']
+        else:
+            del input_dict[processid]
 
-    grass_module_list = []
     virtual_module_params = {}
     virtual_module_returns = {}
 
-    for i in xml_strings:
-        xml_string = i['stdout']
+    for k,v in input_dict.items():
+        xml_string = v['xml_string']
+        aggregated_keys = v['gparams']
         grass_module = ParseInterfaceDescription(
             xml_string,
-            keys=aggregated_keys
+            keys=aggregated_keys.keys()
         )
-        grass_module_list.append(grass_module)
+
         if 'parameters' in grass_module:
             for param in grass_module['parameters']:
-                if param in input_dict:
-                    amkey = input_dict[param]['amkey']
+                if param in aggregated_keys.keys():
+                    amkey = aggregated_keys[param]['amkey']
                     virtual_module_params[amkey] = grass_module['parameters'][param]
 
                     add_param_description(
-                        virtual_module_params[amkey], param, input_dict)
+                        virtual_module_params[amkey], param, aggregated_keys)
 
         if 'returns' in grass_module:
             for param in grass_module['returns']:
-                if param in input_dict:
-                    amkey = input_dict[param]['amkey']
+                if param in aggregated_keys.keys():
+                    amkey = aggregated_keys[param]['amkey']
                     virtual_module_returns[amkey] = grass_module['returns'][param]
 
                     add_param_description(
