@@ -79,7 +79,10 @@ def createProcessChainTemplateList():
 
     for tpl_string in tpl_list:
         tpl = pcTplEnv.get_template(tpl_string)
-        pc_template = json.loads(tpl.render().replace('\n', ''))
+        try:
+            pc_template = json.loads(tpl.render().replace('\n', ''))
+        except:
+            log.error('Error parsing template ' + tpl_string)
 
         tpl_id = pc_template['id']
         description = pc_template['description']
