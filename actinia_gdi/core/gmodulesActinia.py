@@ -53,8 +53,15 @@ def filter_func(name):
 
 def renderTemplate(pc):
 
+    tplPath = pc + '.json'
+
+    # change path to template if in subdir
+    for i in pcTplEnv.list_templates():
+        if i.split('/')[-1] == tplPath:
+            tplPath = i
+
     # find variables from processchain and render template with variables
-    tpl_source = pcTplEnv.loader.get_source(pcTplEnv, pc + '.json')[0]
+    tpl_source = pcTplEnv.loader.get_source(pcTplEnv, tplPath)[0]
     parsed_content = pcTplEnv.parse(tpl_source)
     # {'column_name', 'name'}
     undef = meta.find_undeclared_variables(parsed_content)
@@ -63,7 +70,7 @@ def renderTemplate(pc):
     for i in undef:
         kwargs[i] = '{{ ' + i + ' }}'
 
-    tpl = pcTplEnv.get_template(pc + '.json')
+    tpl = pcTplEnv.get_template(tplPath)
     pc_template = json.loads(tpl.render(**kwargs).replace('\n', ''))
 
     return pc_template
