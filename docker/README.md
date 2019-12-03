@@ -278,3 +278,13 @@ http://127.0.0.1:8088/api/v1/modules/vector_area5
 http://127.0.0.1:8088/api/v1/swagger.json
 
 ```
+
+## manual build to dockerhub
+
+Only for latest image. Checkout and pull master branch and make sure you don't
+have any local changes.
+```
+docker build -f docker/actinia-core/Dockerfile -t actini-gdi:latest .
+docker tag f6865645c733 mundialis/actinia-gdi:latest
+docker push mundialis/actinia-gdi:latest
+```

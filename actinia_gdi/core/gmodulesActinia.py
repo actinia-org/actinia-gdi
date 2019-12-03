@@ -56,7 +56,7 @@ def renderTemplate(pc):
     tplPath = pc + '.json'
 
     # change path to template if in subdir
-    for i in pcTplEnv.list_templates():
+    for i in pcTplEnv.list_templates(filter_func=filter_func):
         if i.split('/')[-1] == tplPath:
             tplPath = i
 
@@ -295,6 +295,11 @@ def fillTemplateFromProcessChain(module):
         kwargs[key] = val
 
     tpl_file = module["module"] + '.json'
+
+    # change path to template if in subdir
+    for i in pcTplEnv.list_templates(filter_func=filter_func):
+        if i.split('/')[-1] == tpl_file:
+            tpl_file = i
 
     # find variables from processchain
     tpl_source = pcTplEnv.loader.get_source(pcTplEnv, tpl_file)[0]
