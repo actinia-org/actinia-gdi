@@ -42,6 +42,9 @@ entry_points = {
 def setup_package():
     setup(setup_requires=['pyscaffold>=3.0a0,<3.1a0'],
           entry_points=entry_points,
+          packages=['actinia_gdi'],
+          package_dir={'actinia_gdi': 'actinia_gdi'},
+          include_package_data=True,
           use_pyscaffold=True)
 
 
