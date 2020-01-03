@@ -324,9 +324,9 @@ def updateXml(response, utcnow):
 
         dateStampEl = recordNode.getElementsByTagName('gmd:dateStamp')[0]
         dateEl = dateStampEl.getElementsByTagName('gco:Date')
-        if len(dateEl) is 0:
+        if len(dateEl) == 0:
             dateEl = dateStampEl.getElementsByTagName('gco:DateTime')
-            if len(dateEl) is 0:
+            if len(dateEl) == 0:
                 log.error('Could not find date element')
                 return None
             else:
