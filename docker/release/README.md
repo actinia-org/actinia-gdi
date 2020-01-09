@@ -5,7 +5,7 @@ The `docker build` command builds the wheel and integrated the build-args for
 the github release.
 
 The `docker run` command creates the build and uploads the
-before created wheel as asset.
+previously created wheel as asset.
 
 
 ```
