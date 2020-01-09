@@ -9,6 +9,8 @@ COPY . /src/actinia-gdi
 WORKDIR /src/actinia-gdi
 # TODO: include tests. Currently only running whith actinia_core installed
 # RUN pip3 install -r requirements.txt && python3 setup.py test
+# build including dependency list from setup.cfg (automatically installed).
+# pip3 wheel creates wheels out of all requirements for offline usage
 RUN python3 -m pep517.build --out-dir /build . && \
     pip3 wheel -r requirements.txt -w /build
 
