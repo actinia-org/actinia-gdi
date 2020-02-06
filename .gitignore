@@ -41,6 +41,7 @@ cover/*
 MANIFEST
 
 # Development env
+dev
 venv/
 showcase
 config/mount/config.ini
