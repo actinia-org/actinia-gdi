@@ -7,7 +7,10 @@ gunicorn>=19.7.1
 jsonmodels>=2.3
 peewee>=3.2.2
 psycopg2-binary>=2.7.4
+pyscaffold
 pytest-cov>=2.5.1
 requests>=2.20.0
 setuptools
 xmltodict>=0.11.0
+
+# pyscaffold needed for s2i build
