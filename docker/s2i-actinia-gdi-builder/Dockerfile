@@ -1,4 +1,4 @@
-FROM centos/python-35-centos7
+FROM centos/python-36-centos7
 
 # Overwrite the base image run script to make port configurable
 COPY ./s2i/bin/run $STI_SCRIPTS_PATH/
