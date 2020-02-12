@@ -30,12 +30,11 @@ from flask_restful_swagger_2 import Api
 
 from actinia_gdi import endpoints
 from actinia_gdi.core.jobtable import initJobDB
-from actinia_gdi.resources.logging import log, MyRequestHandler
+from actinia_gdi.resources.logging import log
 from actinia_gdi.resources.config import APP
 
 
 app = Flask(__name__)
-app.request_handler = MyRequestHandler
 CORS(app)
 
 apidoc = Api(

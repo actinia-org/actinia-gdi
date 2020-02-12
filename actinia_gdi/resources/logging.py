@@ -35,12 +35,12 @@ from werkzeug.serving import WSGIRequestHandler
 from actinia_gdi.resources.config import LOGCONFIG
 
 
-# TODO: Notice: do not call logging.warning (will create new logger for ever)
+# Notice: do not call logging.warning (will create new logger for ever)
 # logging.warning("called actinia_gdi logger after 1")
-
 
 log = logging.getLogger('actinia-gdi')
 werkzeugLog = logging.getLogger('werkzeug')
+gunicornLog = logging.getLogger('gunicorn')
 
 
 def setLogFormat(veto=None):
@@ -57,18 +57,15 @@ def setLogFormat(veto=None):
     return logformat
 
 
-def setWerkzeugFormat():
-    werkzeugLogformat = ""
-    if LOGCONFIG.type == 'json':
-        werkzeugLogformat = CustomJsonFormatter('(time) (level) (component) '
-                                                '(message) (processName) '
-                                                '(threadName)')
-    else:
-        werkzeugLogformat = ColoredFormatter(
-            '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)-22s -'
-            '%(message)s %(reset)s'
-        )
-    return werkzeugLogformat
+def setLogHandler(logger, type, format):
+    if type == 'stdout':
+        handler = logging.StreamHandler()
+    elif type == 'file':
+        # For readability, json is never written to file
+        handler = FileHandler(LOGCONFIG.logfile)
+
+    handler.setFormatter(format)
+    logger.addHandler(handler)
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
@@ -81,15 +78,9 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
         # 'msecs', 'msg', 'name', 'pathname', 'process', 'processName',
         # 'relativeCreated', 'stack_info', 'thread', 'threadName']
 
-        if not log_record.get('timestamp'):
-            # this doesn't use record.created, so it is slightly off
-            now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            log_record['time'] = now
-        if log_record.get('level'):
-            log_record['level'] = log_record['level'].upper()
-        else:
-            log_record['level'] = record.levelname
-
+        now = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        log_record['time'] = now
+        log_record['level'] = record.levelname
         log_record['component'] = record.name
 
 
@@ -98,41 +89,32 @@ def createLogger():
     log.setLevel(getattr(logging, LOGCONFIG.level))
     fileformat = setLogFormat('veto')
     stdoutformat = setLogFormat()
-
-    # Setup the logger handler for stdout
-    handler = logging.StreamHandler()
-    handler.setFormatter(stdoutformat)
-    log.addHandler(handler)
-
-    # Setup the logger handler for filesystem. If json, it still is not json
-    # for readability
-    file_handler = FileHandler(LOGCONFIG.logfile)
-    file_handler.setFormatter(fileformat)
-    log.addHandler(file_handler)
+    setLogHandler(log, 'file', fileformat)
+    setLogHandler(log, 'stdout', stdoutformat)
 
 
 def createWerkzeugLogger():
     werkzeugLog.setLevel(getattr(logging, LOGCONFIG.level))
-    werkzeugLogformat = setWerkzeugFormat()
-
-    # Setup the logger handler for stdout
-    werkzeugHandler = logging.StreamHandler()
-    werkzeugHandler.setFormatter(werkzeugLogformat)
-    werkzeugLog.addHandler(werkzeugHandler)
-
-    # Setup the logger handler for filesystem
-    werkzeugFile_handler = FileHandler(LOGCONFIG.logfile)
-    werkzeugFile_handler.setFormatter(werkzeugLogformat)
-    werkzeugLog.addHandler(werkzeugFile_handler)
+    fileformat = setLogFormat('veto')
+    stdoutformat = setLogFormat()
+    setLogHandler(werkzeugLog, 'file', fileformat)
+    setLogHandler(werkzeugLog, 'stdout', stdoutformat)
 
 
-class MyRequestHandler(WSGIRequestHandler):
-
-    def log(self, type, message, *args):
-        getattr(werkzeugLog, type)(
-            self.address_string() + ": " + (message % args)
-        )
+def createGunicornLogger():
+    gunicornLog.setLevel(getattr(logging, LOGCONFIG.level))
+    fileformat = setLogFormat('veto')
+    stdoutformat = setLogFormat()
+    setLogHandler(gunicornLog, 'file', fileformat)
+    setLogHandler(gunicornLog, 'stdout', stdoutformat)
+    # gunicorn already has a lot of children logger, e.g gunicorn.http,
+    # gunicorn.access. These lines deactivate their default handlers.
+    for name in logging.root.manager.loggerDict:
+        if "gunicorn." in name:
+            logging.getLogger(name).propagate = True
+            logging.getLogger(name).handlers = []
 
 
 createLogger()
 createWerkzeugLogger()
+createGunicornLogger()
