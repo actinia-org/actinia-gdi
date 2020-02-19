@@ -107,10 +107,10 @@ docker build docker/s2i-actinia-gdi-builder -t s2i-actinia-gdi-builder
 ```
 __To update actinia-gdi, run:__
 ```
-s2i build git@github.com:mundialis/actinia-gdi.git s2i-actinia-gdi-builder actinia-gdi -e APP_CONFIG=/gunicorn.cfg
+s2i build git@github.com:mundialis/actinia-gdi.git s2i-actinia-gdi-builder actinia-gdi -e APP_CONFIG=/gunicorn.cfg -c
 
 # if you have local actinia-gdi changes, run
-# s2i build actinia-gdi s2i-actinia-gdi-builder actinia-gdi -e APP_CONFIG=/gunicorn.cfg
+# s2i build actinia-gdi s2i-actinia-gdi-builder actinia-gdi -e APP_CONFIG=/gunicorn.cfg -c
 
 ```
 __To run actinia-gdi as standalone app, run__
