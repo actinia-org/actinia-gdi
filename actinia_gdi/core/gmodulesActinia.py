@@ -26,7 +26,7 @@ Module management related to process chain templates
 
 """
 import json
-from jinja2 import meta
+from jinja2 import meta, nodes
 import re
 
 from actinia_gdi.core.gmodulesProcessor import run_process_chain
@@ -303,6 +303,37 @@ def createActiniaModule(self, processchain):
     return virtual_module
 
 
+def find_filters(ast):
+    """Find all the nodes of a given type.  If the type is a tuple,
+    the check is performed for any of the tuple items.
+    Function from: https://stackoverflow.com/questions/55275399/how-to-get-variables-along-with-their-filter-name-from-jinja2-template
+    """
+    for child in ast.iter_child_nodes():
+        if isinstance(child, nodes.Filter):
+            yield child
+        else:
+            for result in find_filters(child):
+                yield result
+
+
+def filtered_variables(ast):
+    """Return variables that have filters, along with their filters. might
+    return duplicate variable names with different filters
+    Function from: https://stackoverflow.com/questions/55275399/how-to-get-variables-along-with-their-filter-name-from-jinja2-template
+    """
+    results = []
+    for i, node in enumerate(find_filters(ast)):
+        filters = []
+        f = node
+        filters.append(f.name)
+        while isinstance(f.node, nodes.Filter):
+            f = f.node
+            filters.append(f.name)
+        filters.reverse()
+        results.append((f.node.name, filters))
+    return results
+
+
 def fillTemplateFromProcessChain(module):
     """ This method receives a process chain for an actinia module and loads
         the according process chain template. The received values will be
@@ -338,8 +369,15 @@ def fillTemplateFromProcessChain(module):
     parsed_content = pcTplEnv.parse(tpl_source)
     undef = meta.find_undeclared_variables(parsed_content)
 
+    # find default variables from processchain
+    default_vars = []
+    filtered_vars = filtered_variables(parsed_content)
+    for filtered_var in filtered_vars:
+        if 'default' in filtered_var[1]:
+            default_vars.append(filtered_var[0])
+
     for i in undef:
-        if i not in kwargs.keys():
+        if i not in kwargs.keys() and not i in default_vars:
             log.error('Required parameter "' + i + '" not in process chain!')
             return i
 

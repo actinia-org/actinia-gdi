@@ -17,7 +17,7 @@ COPY docker/actinia-core/actinia.cfg /etc/default/actinia
 COPY docker/actinia-core/start.sh /src/start.sh
 COPY docker/actinia-core/start-dev.sh /src/start-dev.sh
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/sh"]
 CMD ["/src/start.sh"]
 
 ENV GISBASE ""
