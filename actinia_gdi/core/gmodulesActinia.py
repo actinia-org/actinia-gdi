@@ -140,6 +140,7 @@ def createActiniaModule(self, processchain):
     processes = pc_template['template']['list']
 
     aggregated_vals = []
+    aggregated_exes = []
     input_dict = {}
     import_descr_dict = {}
     exporter_dict = {}
@@ -148,6 +149,13 @@ def createActiniaModule(self, processchain):
     for i in processes:
 
         # create the exec_process_chain item
+        if 'exe' in i and 'params' in i:
+            for j in i['params']:
+                if '{{ ' in j and ' }}' in j and j not in aggregated_exes:
+                    placeholder = re.search(r"\{\{(.*?)\}\}", j).groups()[0].strip(' ')
+                    if placeholder not in aggregated_exes:
+                        aggregated_exes.append(placeholder)
+            continue
         module = i['module']
         processid = i['id']
         # TODO: display this in module description?
@@ -248,10 +256,13 @@ def createActiniaModule(self, processchain):
             for param in grass_module['returns']:
                 if param in aggregated_keys.keys():
                     amkey = aggregated_keys[param]['amkey']
-                    virtual_module_returns[amkey] = grass_module['returns'][param]
+                    if amkey in virtual_module_params:
+                        pass
+                    else:
+                        virtual_module_returns[amkey] = grass_module['returns'][param]
 
-                    add_param_description(
-                        virtual_module_returns[amkey], param, input_dict)
+                        add_param_description(
+                            virtual_module_returns[amkey], param, input_dict)
 
         if 'import_descr' in grass_module:
             for param in grass_module['import_descr']:
@@ -270,6 +281,16 @@ def createActiniaModule(self, processchain):
 
                         add_param_description(
                             virtual_module_returns[key], 'exporter' + param, exporter_dict)
+
+    # add parameters from executable
+    for param in aggregated_exes:
+        exe_param = {}
+        exe_param['description'] = 'Simple parameter from executable'
+        exe_param['required'] = True
+        exe_param['schema'] = {'type': 'string'}
+        add_param_description(
+            exe_param, 'exe', dict())
+        virtual_module_params[param] = exe_param
 
     virtual_module = Module(
         id=pc_template['id'],
