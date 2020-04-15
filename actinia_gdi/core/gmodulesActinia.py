@@ -174,17 +174,27 @@ def createActiniaModule(self, processchain):
             if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
                 aggregated_vals.append(val)
                 run_interface_descr = True
-                input_dict[processid]["gparams"][key] = {}
 
                 # matches placeholder in longer value, e.g. in
                 # 'res = if(input <= {{ my_values }}, 1, null() )'
                 # beware that in general it is easier to make the whole value
                 # a placeholder. Might be not possible for e.g. r.mapcalc
-                placeholder = re.search(r"\{\{(.*?)\}\}", str(val)).groups()[0]
-                amkey = placeholder.strip(' ')
-                input_dict[processid]["gparams"][key]['amkey'] = amkey
-                if 'comment' in j:
-                    input_dict[processid]["gparams"][key]['comment'] = j['comment']
+                placeholders = re.findall(r"\{\{(.*?)\}\}", str(val))
+
+                if len(placeholders) == 1:
+                    input_dict[processid]["gparams"][key] = {}
+                    amkey = placeholders[0].strip(' ')
+                    input_dict[processid]["gparams"][key]['amkey'] = amkey
+                    if 'comment' in j:
+                        input_dict[processid]["gparams"][key]['comment'] = j['comment']
+                else:
+                    for placeholder in placeholders:
+                        amkey = placeholder.strip(' ')
+                        newkey = "%s_%s" % (key, amkey)
+                        input_dict[processid]["gparams"][newkey] = {}
+                        input_dict[processid]["gparams"][newkey]['amkey'] = amkey
+                        if 'comment' in j:
+                            input_dict[processid]["gparams"][newkey]['comment'] = j['comment']
 
             if 'import_descr' in j:
                 for key, val in j['import_descr'].items():
@@ -223,6 +233,7 @@ def createActiniaModule(self, processchain):
             xml_string,
             keys=aggregated_keys.keys()
         )
+        import pdb; pdb.set_trace()
 
         if 'parameters' in grass_module:
             for param in grass_module['parameters']:

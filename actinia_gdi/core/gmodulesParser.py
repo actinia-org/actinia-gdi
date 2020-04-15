@@ -198,6 +198,7 @@ def ParseInterfaceDescription(xml_string, keys=None):
         if keys:
             # case for actinia modules
             key = setVirtualParameterKey(module_id, parameter)
+            import pdb;pdb.set_trace()
             if key not in keys:
                 continue
         else:
