@@ -1,0 +1,19 @@
+{
+	"id": "default_value",
+	"description": "test default value in actinia-gdi",
+	"template": {
+		"version": "1",
+		"list": [
+			{
+				"module": "r.mapcalc",
+				"id": "r.mapcalc_test",
+				"inputs": [
+					{
+						"param": "expression",
+						"value": "{{ output }} = {{ value|default(0.428) }}"
+					}
+			  ]
+			}
+		]
+	}
+}
