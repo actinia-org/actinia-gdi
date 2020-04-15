@@ -40,14 +40,14 @@ docker-compose --file docker/docker-compose-plugin-prod.yml up
 For actinia-gdi development, run and enter the running container.
 ```
 docker-compose --file docker/docker-compose-plugin.yml run --rm \
-  --service-ports -w /src/actinia-gdi --entrypoint bash \
+  --service-ports -w /src/actinia-gdi --entrypoint sh \
   -v $HOME/repos/actinia/actinia-gdi/actinia_gdi:/src/actinia-gdi/actinia_gdi actinia-core
 ```
 
 And run the actinia-core server with your mounted source code:
 ```
 python3 setup.py install
-bash /src/start-dev.sh
+sh /src/start-dev.sh
 
 # python3 -m actinia_core.main
 gunicorn -b 0.0.0.0:8088 -w 1 --access-logfile=- -k gthread actinia_core.main:flask_app
