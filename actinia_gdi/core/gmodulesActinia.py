@@ -110,12 +110,17 @@ def add_param_description(moduleparameter, param, input_dict):
     # update description and mention grass module parameter
     suffix = " [generated from " + param + "]"
     moduleparameter['description'] += suffix
-    # add comment if there is one in process chain template
 
+    # add comment if there is one in process chain template
+    if not param in input_dict:
+        for input_dict_key in input_dict:
+            if param in input_dict_key:
+                param = input_dict_key
     if param in input_dict and 'comment' in input_dict[param]:
         comment = input_dict[param]['comment']
-        moduleparameter['description'] += " - " + comment
-        # moduleparameter['comment'] = comment
+        if comment not in moduleparameter['description']:
+            moduleparameter['description'] += " - " + comment
+            # moduleparameter['comment'] = comment
 
 
 def createActiniaModule(self, processchain):
@@ -241,16 +246,16 @@ def createActiniaModule(self, processchain):
             xml_string,
             keys=aggregated_keys.keys()
         )
-        import pdb; pdb.set_trace()
 
         if 'parameters' in grass_module:
             for param in grass_module['parameters']:
-                if param in aggregated_keys.keys():
-                    amkey = aggregated_keys[param]['amkey']
-                    virtual_module_params[amkey] = grass_module['parameters'][param]
+                for aggregated_key in aggregated_keys:
+                    if param in aggregated_key:
+                        amkey = aggregated_keys[aggregated_key]['amkey']
+                        virtual_module_params[amkey] = grass_module['parameters'][param]
 
-                    add_param_description(
-                        virtual_module_params[amkey], param, aggregated_keys)
+                        add_param_description(
+                            virtual_module_params[amkey], param, aggregated_keys)
 
         if 'returns' in grass_module:
             for param in grass_module['returns']:
