@@ -198,7 +198,14 @@ def ParseInterfaceDescription(xml_string, keys=None):
         if keys:
             # case for actinia modules
             key = setVirtualParameterKey(module_id, parameter)
+            key_exists = False
             if key not in keys:
+                for actiniakey in keys:
+                    if actiniakey.startswith(key):
+                        key_exists = True
+            else:
+                key_exists = True
+            if not key_exists:
                 continue
         else:
             # case for GRASS modules

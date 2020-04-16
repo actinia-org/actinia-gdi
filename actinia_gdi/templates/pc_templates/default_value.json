@@ -10,6 +10,7 @@
 				"inputs": [
 					{
 						"param": "expression",
+						"comment": "output = r.mapcalc result, string; value = raster value (default=0.428), float",
 						"value": "{{ output }} = {{ value|default(0.428) }}"
 					}
 			  ]
