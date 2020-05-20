@@ -75,6 +75,40 @@ def log_error_to_resource_logger(self, msg, rdc):
     )
 
 
+def set_actinia_modules(self, rdc, pc_list, grass_module_list, actinia_module_list):
+    new_pc = []
+    for module in pc_list:
+        if "module" in module:
+            name = module["module"]
+            if name in ["importer", "exporter"]:
+                new_pc.append(module)
+            elif name in grass_module_list:
+                new_pc.append(module)
+            elif name in actinia_module_list:
+                module_pc = fillTemplateFromProcessChain(module)
+                if isinstance(module_pc, str):
+                    # then return value is a missing attribute
+                    msg = ("Required parameter '%s' missing in actinia-module "
+                           " '%s'." % (module_pc, name))
+                    log_error_to_resource_logger(self, msg, rdc)
+                    return
+                elif module_pc is None:
+                    msg = "Invalid request for %s" % (name)
+                    log_error_to_resource_logger(self, msg, rdc)
+                    return
+                else:
+                    ac_module_pc = set_actinia_modules(self, rdc, module_pc, grass_module_list, actinia_module_list)
+                    new_pc.extend(ac_module_pc)
+            else:
+                msg = ("Module %s is not of type importer, exporter, "
+                       "grass-module or an actinia-module." % name)
+                log_error_to_resource_logger(self, msg, rdc)
+                return
+        else:
+            new_pc.append(module)
+    return new_pc
+
+
 def preprocess_build_pc_and_enqueue(self, preprocess_kwargs, start_job):
     """ This method looks up the lists of GRASS GIS and actinia modules to
     parse the incoming process chain. If an actinia-module is found, it is
@@ -100,36 +134,7 @@ def preprocess_build_pc_and_enqueue(self, preprocess_kwargs, start_job):
     if rdc:
         rdc.set_storage_model_to_file()
 
-        new_pc = []
-        for module in rdc.request_data['list']:
-            if "module" in module:
-                name = module["module"]
-                if name in ["importer", "exporter"]:
-                    new_pc.append(module)
-                elif name in grass_module_list:
-                    new_pc.append(module)
-                elif name in actinia_module_list:
-                    module_pc = fillTemplateFromProcessChain(module)
-                    if isinstance(module_pc, str):
-                        # then return value is a missing attribute
-                        msg = ("Required parameter '%s' missing in actinia-module "
-                               " '%s'." % (module_pc, name))
-                        log_error_to_resource_logger(self, msg, rdc)
-                        return
-                    elif module_pc is None:
-                        msg = "Invalid request for %s" % (name)
-                        log_error_to_resource_logger(self, msg, rdc)
-                        return
-                    else:
-                        new_pc.extend(module_pc)
-                else:
-                    msg = ("Module %s is not of type importer, exporter, "
-                           "grass-module or an actinia-module." % name)
-                    log_error_to_resource_logger(self, msg, rdc)
-                    return
-            else:
-                new_pc.append(module)
-
+        new_pc = set_actinia_modules(self, rdc, rdc.request_data['list'], grass_module_list, actinia_module_list)
         rdc.request_data['list'] = new_pc
 
         enqueue_job(self.job_timeout, start_job, rdc)
