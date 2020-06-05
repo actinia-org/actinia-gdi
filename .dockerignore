@@ -1,8 +1,5 @@
 docker
-!docker/actinia-core/actinia-gdi.cfg
 !docker/actinia-core/actinia.cfg
-!docker/actinia-core/start.sh
-!docker/actinia-core/start-dev.sh
 !docker/release/create_release_with_asset.sh
 .gitignore
 .github
