@@ -51,9 +51,22 @@ def filter_func(name):
     return False
 
 
-def renderTemplate(pc):
+def get_template_undef(tpl_name):
+    """Find out placeholders of a template
 
-    tplPath = pc + '.json'
+    Parameters
+    ----------
+    tpl_name : string
+        Name of template.
+
+    Returns
+    -------
+    undef : list
+        List of placeholders of template
+
+    """
+
+    tplPath = tpl_name + '.json'
 
     # change path to template if in subdir
     for i in pcTplEnv.list_templates(filter_func=filter_func):
@@ -65,6 +78,14 @@ def renderTemplate(pc):
     parsed_content = pcTplEnv.parse(tpl_source)
     # {'column_name', 'name'}
     undef = meta.find_undeclared_variables(parsed_content)
+    return undef
+
+
+def render_template(pc):
+
+    tplPath = pc + '.json'
+
+    undef = get_template_undef(pc)
 
     kwargs = {}
     for i in undef:
@@ -109,10 +130,11 @@ def add_param_description(moduleparameter, param, input_dict):
 
     # update description and mention grass module parameter
     suffix = " [generated from " + param + "]"
-    moduleparameter['description'] += suffix
+    if suffix not in moduleparameter['description']:
+        moduleparameter['description'] += suffix
 
     # add comment if there is one in process chain template
-    if not param in input_dict:
+    if param not in input_dict:
         for input_dict_key in input_dict:
             if param in input_dict_key:
                 param = input_dict_key
@@ -123,46 +145,125 @@ def add_param_description(moduleparameter, param, input_dict):
             # moduleparameter['comment'] = comment
 
 
-def createActiniaModule(self, processchain):
-    '''
-       This method is used to create self-descriptions for actinia-modules.
-       In this method the terms "processchain" and "exec_process_chain" are
-       used. "processchain" is the name of the template for which the
-       description is requested, "exec_process_chain" is the pc that is created
-       to collect all module descriptions referenced in the template.
+class ValuePlaceholder(object):
+    """Object to collect attributes for all placeholder types. Might be later
+    separated into ValuePlaceholder, ImporterPlaceholder, ...
+    """
 
-       This method loads a stored process-chain template and for each GRASS
-       module that is found, it checks if one value contains a placeholder. If
-       this is the case and the name of the placeholder variable was not used by
-       another GRASS module already, a new exec_process_chain item is generated,
-       requesting the interface description from GRASS GIS. Then the whole
-       exec_process_chain with all interface descriptions is executed.
-       The response is parsed to show one actinia-module containing only the
-       attributes which can be replaced in the processchain template.
-    '''
+    def __init__(self, val, param, module, module_id):
+        self.val = val  # '{{ db_connection }}'
+        self.param = param  # input
+        self.module = module  # v.import
+        self.module_id = module_id  # import_training_data
+        self.comment = None
+        self.run_interface_descr = False
 
-    pc_template = renderTemplate(processchain)
-    processes = pc_template['template']['list']
+        # matches placeholder in longer value, e.g. in
+        # 'res = if(input <= {{ my_values }}, 1, null() )'
+        # beware that in general it is easier to make the whole value
+        # a placeholder. Might be not possible for e.g. r.mapcalc
+        self.placeholders = re.findall(r"\{\{(.*?)\}\}", str(self.val))
+        self.placeholders = [x.strip(' ') for x in self.placeholders]
+        self.key = self.module + '_' + self.param  # 'v.import_input'
+        # 'import_training_data_input'
+        self.uuid = self.module_id + '_' + self.param
 
-    aggregated_vals = []
-    aggregated_exes = []
-    input_dict = {}
-    import_descr_dict = {}
-    exporter_dict = {}
-    count = 1
 
-    for i in processes:
+class PlaceholderCollector(object):
 
-        # create the exec_process_chain item
+    def __init__(self, resourceBaseSelf):
+        self.aggregated_exes = []
+        self.aggregated_vals = []
+        self.input_dict = {}
+        self.import_descr_dict = {}
+        self.exporter_dict = {}
+        self.count = 1
+        self.vps = []
+        self.resourceBaseSelf = resourceBaseSelf
+        # array of child ModuleCollector instances if nested actiniamodule
+        self.child_pcs = []
+        self.nested_modules = []
+        self.actiniamodules_list = []
+
+        actiniamodules = createProcessChainTemplateList()
+        for k in actiniamodules:
+            self.actiniamodules_list.append(k['id'])
+
+    def collect_value_placeholders(self, vp):
+
+        # do not run interface description if module is
+        # nested actiniamodule in actiniamodule
+        if vp.module in self.actiniamodules_list:
+            module_pc_tpl = render_template(vp.module)
+            module_list_items = module_pc_tpl['template']['list']
+            child_amc = PlaceholderCollector(self.resourceBaseSelf)
+            self.nested_modules.append(vp)
+
+            for item in module_list_items:
+                child_amc.loop_list_items(item)
+                self.child_pcs.append(child_amc)
+
+            return
+
+        self.vps.append(vp)
+        self.aggregated_vals.append(vp.val)
+        self.input_dict[vp.module_id]["run_interface_descr"] = True
+
+        if len(vp.placeholders) == 1:
+            self.input_dict[vp.module_id]["gparams"][vp.key] = {}
+            self.input_dict[vp.module_id]["gparams"][vp.key]['amkey'] = vp.placeholders[0]
+            if vp.comment is not None:
+                self.input_dict[vp.module_id]["gparams"][vp.key]['comment'] = vp.comment
+        else:
+            for amkey in vp.placeholders:
+                newkey = "%s_%s" % (vp.key, amkey)
+                self.input_dict[vp.module_id]["gparams"][newkey] = {}
+                self.input_dict[vp.module_id]["gparams"][newkey]['amkey'] = amkey
+                if vp.comment is not None:
+                    self.input_dict[vp.module_id]["gparams"][newkey]['comment'] = vp.comment
+
+    def collect_im_and_exporter_placeholders(self, vp, j, im_or_export):
+        for key, val in j[im_or_export].items():
+            if '{{ ' in val and ' }}' in val:
+                self.input_dict[vp.module_id]["run_interface_descr"] = True
+                # TODO: check if only part of value can be placeholder
+                stripval = val.strip('{{').strip('}}').strip(' ')
+                if im_or_export == "import_descr":
+                    self.import_descr_dict[stripval] = key
+                else:
+                    self.exporter_dict[stripval] = key
+
+    def execute_interface_descr(self, vp):
+        item_key = str(self.count)
+        pc_item = {item_key: {"module": vp.module,
+                              "interface-description": True}}
+        response = run_process_chain(self.resourceBaseSelf, pc_item)
+        xml_strings = response['process_log']
+        self.count = self.count + 1
+        self.input_dict[vp.module_id]['xml_string'] = xml_strings[0]['stdout']
+
+    def loop_list_items(self, i):
+        """Loop over each item in process chain list and search for all
+        placeholders. Might be param of an executable or value of a
+        grass_module param. Value of actinia_module param is also possible.
+
+        Fills self.input_dict, self.import_descr_dict and self.exporter_dict
+        and runs interface description for grass_modules.
+
+        """
+
+        # collect the "exec" list items
         if 'exe' in i and 'params' in i:
             for j in i['params']:
-                if '{{ ' in j and ' }}' in j and j not in aggregated_exes:
-                    placeholder = re.search(r"\{\{(.*?)\}\}", j).groups()[0].strip(' ')
-                    if placeholder not in aggregated_exes:
-                        aggregated_exes.append(placeholder)
-            continue
+                if '{{ ' in j and ' }}' in j and j not in self.aggregated_exes:
+                    ph = re.search(r"\{\{(.*?)\}\}", j).groups()[0].strip(' ')
+                    if ph not in self.aggregated_exes:
+                        self.aggregated_exes.append(ph)
+            return
+
         module = i['module']
-        processid = i['id']
+        module_id = i['id']
+
         # TODO: display this in module description?
         # if hasattr(i, 'comment'):
         #     comment = i['comment']
@@ -173,136 +274,180 @@ def createActiniaModule(self, processchain):
         if i.get('outputs') is not None:
             inOrOutputs += i.get('outputs')
 
-        run_interface_descr = False
-        input_dict[processid] = {}
-        input_dict[processid]["gparams"] = {}
+        # run_interface_descr = False
 
-        # aggregate all keys where values are a variable
+        self.input_dict[module_id] = {}
+        self.input_dict[module_id]["gparams"] = {}
+        self.input_dict[module_id]["run_interface_descr"] = False
+
+        # aggregate all keys where values are a variable (placeholder)
         # in the processchain template
         # only aggregate them if the template value differs
         for j in inOrOutputs:
             val = j['value']
-            key = module + '_' + j['param']
-            uuid = processid + '_' + j['param']
-            if '{{ ' in val and ' }}' in val and val not in aggregated_vals:
-                aggregated_vals.append(val)
-                run_interface_descr = True
+            vp = ValuePlaceholder(val, j['param'], module, module_id)
+            if 'comment' in j:
+                vp.comment = j['comment']
 
-                # matches placeholder in longer value, e.g. in
-                # 'res = if(input <= {{ my_values }}, 1, null() )'
-                # beware that in general it is easier to make the whole value
-                # a placeholder. Might be not possible for e.g. r.mapcalc
-                placeholders = re.findall(r"\{\{(.*?)\}\}", str(val))
-
-                if len(placeholders) == 1:
-                    input_dict[processid]["gparams"][key] = {}
-                    amkey = placeholders[0].strip(' ')
-                    input_dict[processid]["gparams"][key]['amkey'] = amkey
-                    if 'comment' in j:
-                        input_dict[processid]["gparams"][key]['comment'] = j['comment']
-                else:
-                    for placeholder in placeholders:
-                        amkey = placeholder.strip(' ')
-                        newkey = "%s_%s" % (key, amkey)
-                        input_dict[processid]["gparams"][newkey] = {}
-                        input_dict[processid]["gparams"][newkey]['amkey'] = amkey
-                        if 'comment' in j:
-                            input_dict[processid]["gparams"][newkey]['comment'] = j['comment']
+            if ('{{ ' in val and ' }}' in val
+                    and val not in self.aggregated_vals):
+                self.collect_value_placeholders(vp)
 
             if 'import_descr' in j:
-                for key, val in j['import_descr'].items():
-                    if '{{ ' in val and ' }}' in val:
-                        run_interface_descr = True
-                        # TODO: check if only part of value can be placeholder
-                        stripval = val.strip('{{').strip('}}').strip(' ')
-                        import_descr_dict[stripval] = key
+                self.collect_im_and_exporter_placeholders(vp, j, "import_descr")
 
             if 'exporter' in j:
-                for key, val in j['exporter'].items():
-                    if '{{ ' in val and ' }}' in val:
-                        run_interface_descr = True
-                        # TODO: check if only part of value can be placeholder
-                        stripval = val.strip('{{').strip('}}').strip(' ')
-                        exporter_dict[stripval] = key
+                self.collect_im_and_exporter_placeholders(vp, j, "exporter")
 
-        if run_interface_descr:
-            item_key = str(count)
-            pc_item = {item_key: {"module": module,
-                                  "interface-description": True}}
-            response = run_process_chain(self, pc_item)
-            xml_strings = response['process_log']
-            count = count + 1
-            input_dict[processid]['xml_string'] = xml_strings[0]['stdout']
+        if self.input_dict[module_id]["run_interface_descr"]:
+            self.execute_interface_descr(vp)
         else:
-            del input_dict[processid]
+            del self.input_dict[module_id]
 
-    virtual_module_params = {}
-    virtual_module_returns = {}
 
-    for k,v in input_dict.items():
-        xml_string = v['xml_string']
-        aggregated_keys = v['gparams']
-        grass_module = ParseInterfaceDescription(
-            xml_string,
-            keys=aggregated_keys.keys()
-        )
+class PlaceholderTransformer(object):
 
-        if 'parameters' in grass_module:
-            for param in grass_module['parameters']:
-                for aggregated_key in aggregated_keys:
-                    if param in aggregated_key:
-                        amkey = aggregated_keys[aggregated_key]['amkey']
-                        virtual_module_params[amkey] = grass_module['parameters'][param]
+    def __init__(self):
+        self.vm_params = {}  # parameter to build virtual module
+        self.vm_returns = {}  # return values for virtual module
+        self.aggregated_keys = []
+
+    def populate_vm_params_and_returns(self, gm, pc):
+
+        # shorten variables to maintain readability below
+        self.aks = self.aggregated_keys
+
+        if 'parameters' in gm:
+            for param in gm['parameters']:
+                for ak in self.aks:
+                    if param in ak:
+                        amkey = self.aks[ak]['amkey']
+                        self.vm_params[amkey] = gm['parameters'][param]
 
                         add_param_description(
-                            virtual_module_params[amkey], param, aggregated_keys)
+                            self.vm_params[amkey], param, self.aks)
 
-        if 'returns' in grass_module:
-            for param in grass_module['returns']:
-                if param in aggregated_keys.keys():
-                    amkey = aggregated_keys[param]['amkey']
-                    if amkey in virtual_module_params:
+        if 'returns' in gm:
+            for param in gm['returns']:
+                if param in self.aks.keys():
+                    amkey = self.aks[param]['amkey']
+                    if amkey in self.vm_params:
                         pass
                     else:
-                        virtual_module_returns[amkey] = grass_module['returns'][param]
+                        self.vm_returns[amkey] = gm['returns'][param]
 
                         add_param_description(
-                            virtual_module_returns[amkey], param, input_dict)
+                            self.vm_returns[amkey], param, pc.input_dict)
 
-        if 'import_descr' in grass_module:
-            for param in grass_module['import_descr']:
-                for key, val in import_descr_dict.items():
+        if 'import_descr' in gm:
+            for param in gm['import_descr']:
+                for key, val in pc.import_descr_dict.items():
                     if param == val:
-                        virtual_module_params[key] = grass_module['import_descr'][val]
+                        self.vm_params[key] = gm['import_descr'][val]
 
                         add_param_description(
-                            virtual_module_params[key], 'import_descr_' + param, import_descr_dict)
+                            self.vm_params[key], 'import_descr_' + param,
+                            pc.import_descr_dict)
 
-        if 'exporter' in grass_module:
-            for param in grass_module['exporter']:
-                for key, val in exporter_dict.items():
+        if 'exporter' in gm:
+            for param in gm['exporter']:
+                for key, val in pc.exporter_dict.items():
                     if param == val:
-                        virtual_module_returns[key] = grass_module['exporter'][val]
+                        self.vm_returns[key] = gm['exporter'][val]
 
                         add_param_description(
-                            virtual_module_returns[key], 'exporter' + param, exporter_dict)
+                            self.vm_returns[key], 'exporter' + param,
+                            pc.exporter_dict)
 
-    # add parameters from executable
-    for param in aggregated_exes:
-        exe_param = {}
-        exe_param['description'] = 'Simple parameter from executable'
-        exe_param['required'] = True
-        exe_param['schema'] = {'type': 'string'}
-        add_param_description(
-            exe_param, 'exe', dict())
-        virtual_module_params[param] = exe_param
+    def transformPlaceholder(self, placeholderCollector):
+        """Loops over moduleCollection filled by loop_list_items and enriches
+        information with created grass_module interface description. Will
+        populate self.vm_params and self.vm_returns
+        to create the final ActiniaModuleDescription.
+        """
+
+        placeholderCollection = placeholderCollector.input_dict.items()
+
+        for k, v in placeholderCollection:
+            # case when nested actiniamodule
+            if v['run_interface_descr'] == False:
+                return
+            xml_string = v['xml_string']
+            self.aggregated_keys = v['gparams']
+
+            grass_module = ParseInterfaceDescription(
+                xml_string,
+                keys=self.aggregated_keys.keys()
+            )
+
+            self.populate_vm_params_and_returns(
+                grass_module, placeholderCollector)
+
+        # add parameters from executable
+        for param in placeholderCollector.aggregated_exes:
+            exe_param = {}
+            exe_param['description'] = 'Simple parameter from executable'
+            exe_param['required'] = True
+            exe_param['schema'] = {'type': 'string'}
+            add_param_description(
+                exe_param, 'exe', dict())
+            self.vm_params[param] = exe_param
+
+
+def createActiniaModule(resourceBaseSelf, processchain):
+    '''
+    This method is used to create self-descriptions for actinia-modules.
+    In this method the terms "processchain" and "exec_process_chain" are
+    used. "processchain" is the name of the template for which the
+    description is requested, "exec_process_chain" is the pc that is created
+    to collect all module descriptions referenced in the template.
+
+    This method loads a stored process-chain template and for each GRASS
+    module that is found, it checks if one value contains a placeholder. If
+    this is the case and the name of the placeholder variable was not used by
+    another GRASS module already, a new exec_process_chain item is generated,
+    requesting the interface description from GRASS GIS. Then the whole
+    exec_process_chain with all interface descriptions is executed.
+    The response is parsed to show one actinia-module containing only the
+    attributes which can be replaced in the processchain template.
+    '''
+
+    pc_template = render_template(processchain)
+    pc_template_list_items = pc_template['template']['list']
+    undef = get_template_undef(processchain)
+
+    pc = PlaceholderCollector(resourceBaseSelf)
+    for i in pc_template_list_items:
+        pc.loop_list_items(i)
+
+    pt = PlaceholderTransformer()
+    pt.transformPlaceholder(pc)
+
+    # case when nested actinia_module is found and no interface description
+    # was run
+    for undefitem in undef:
+        if undefitem not in pt.vm_params and undefitem not in pt.vm_returns:
+            child_pt = PlaceholderTransformer()
+            for child_pc in pc.child_pcs:
+                # this will populate child_pt.vm_params and child_pt.vm_returns
+                child_pt.transformPlaceholder(child_pc)
+            for nm in pc.nested_modules:
+                # TODO: confirm that there cannot be multiple placeholders in
+                # one value of an actinia_module (95% sure)
+                if nm.placeholders[0] == undefitem:
+                    if nm.param in child_pt.vm_params.keys():
+                        print('param')
+                        pt.vm_params[undefitem] = child_pt.vm_params[nm.param]
+                    else:
+                        print('return')
+                        pt.vm_returns[undefitem] = child_pt.vm_returns[nm.param]
 
     virtual_module = Module(
         id=pc_template['id'],
         description=pc_template['description'],
         categories=['actinia-module'],
-        parameters=virtual_module_params,
-        returns=virtual_module_returns
+        parameters=pt.vm_params,
+        returns=pt.vm_returns
     )
 
     return virtual_module

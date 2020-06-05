@@ -68,13 +68,13 @@ def setParameterDescription(module_id, key, parameter, kwargs):
     param_descr = ""
 
     try:
-        param_descr = parameter['label']
+        param_descr = parameter['label'] + ". "
         kwargs['description'] = param_descr
     except KeyError:
         # logstring(module_id, key, "label")
         pass
     try:
-        param_descr += '. ' + parameter['description']
+        param_descr += parameter['description'] + ". "
         kwargs['description'] = param_descr
     except KeyError:
         logstring(module_id, key, "description")
