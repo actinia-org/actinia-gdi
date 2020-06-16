@@ -157,6 +157,7 @@ class ValuePlaceholder(object):
         self.module_id = module_id  # import_training_data
         self.comment = None
         self.run_interface_descr = False
+        self.enum = None
 
         # matches placeholder in longer value, e.g. in
         # 'res = if(input <= {{ my_values }}, 1, null() )'
@@ -214,6 +215,8 @@ class PlaceholderCollector(object):
             self.input_dict[vp.module_id]["gparams"][vp.key]['amkey'] = vp.placeholders[0]
             if vp.comment is not None:
                 self.input_dict[vp.module_id]["gparams"][vp.key]['comment'] = vp.comment
+            if vp.enum is not None:
+                self.input_dict[vp.module_id]["gparams"][vp.key]['enum'] = vp.enum
         else:
             for amkey in vp.placeholders:
                 newkey = "%s_%s" % (vp.key, amkey)
@@ -221,6 +224,8 @@ class PlaceholderCollector(object):
                 self.input_dict[vp.module_id]["gparams"][newkey]['amkey'] = amkey
                 if vp.comment is not None:
                     self.input_dict[vp.module_id]["gparams"][newkey]['comment'] = vp.comment
+                if vp.enum is not None:
+                    self.input_dict[vp.module_id]["gparams"][newkey]['enum'] = vp.enum
 
     def collect_im_and_exporter_placeholders(self, vp, j, im_or_export):
         for key, val in j[im_or_export].items():
@@ -288,6 +293,8 @@ class PlaceholderCollector(object):
             vp = ValuePlaceholder(val, j['param'], module, module_id)
             if 'comment' in j:
                 vp.comment = j['comment']
+            if 'enum' in j:
+                vp.enum = j['enum']
 
             if ('{{ ' in val and ' }}' in val
                     and val not in self.aggregated_vals):
@@ -323,6 +330,10 @@ class PlaceholderTransformer(object):
                     if param in ak:
                         amkey = self.aks[ak]['amkey']
                         self.vm_params[amkey] = gm['parameters'][param]
+
+                        if 'enum' in self.aks[param]:
+                            enum = self.aks[param]['enum']
+                            self.vm_params[amkey]['schema']['enum'] = enum
 
                         add_param_description(
                             self.vm_params[amkey], param, self.aks)
