@@ -331,7 +331,8 @@ class PlaceholderTransformer(object):
                         amkey = self.aks[ak]['amkey']
                         self.vm_params[amkey] = gm['parameters'][param]
 
-                        if 'enum' in self.aks[param]:
+                        if (param in self.aks.keys()
+                                and 'enum' in self.aks[param]):
                             enum = self.aks[param]['enum']
                             self.vm_params[amkey]['schema']['enum'] = enum
 
