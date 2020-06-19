@@ -51,12 +51,37 @@ def filter_func(name):
     return False
 
 
-def get_template_undef(tpl_name):
+def get_path_from_pc_name(pc_name):
+    """Find out path of a template
+
+    Parameters
+    ----------
+    pc_name : string
+        Name of template.
+
+    Returns
+    -------
+    tplPath : string
+        Path of template
+
+    """
+
+    tplPath = pc_name + '.json'
+
+    # change path to template if in subdir
+    for i in pcTplEnv.list_templates(filter_func=filter_func):
+        if i.split('/')[-1] == tplPath:
+            tplPath = i
+
+    return tplPath
+
+
+def get_template_undef(pc_name):
     """Find out placeholders of a template
 
     Parameters
     ----------
-    tpl_name : string
+    pc_name : string
         Name of template.
 
     Returns
@@ -65,13 +90,7 @@ def get_template_undef(tpl_name):
         List of placeholders of template
 
     """
-
-    tplPath = tpl_name + '.json'
-
-    # change path to template if in subdir
-    for i in pcTplEnv.list_templates(filter_func=filter_func):
-        if i.split('/')[-1] == tplPath:
-            tplPath = i
+    tplPath = get_path_from_pc_name(pc_name)
 
     # find variables from processchain and render template with variables
     tpl_source = pcTplEnv.loader.get_source(pcTplEnv, tplPath)[0]
@@ -83,7 +102,7 @@ def get_template_undef(tpl_name):
 
 def render_template(pc):
 
-    tplPath = pc + '.json'
+    tplPath = get_path_from_pc_name(pc)
 
     undef = get_template_undef(pc)
 
