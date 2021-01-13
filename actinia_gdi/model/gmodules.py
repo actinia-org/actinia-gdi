@@ -60,7 +60,7 @@ class ModuleParameterSchema(Schema):
         'enum': {
             'type': 'array',
             'items': {
-               'type': 'string'
+                'type': 'string'
             },
             'description': ''
         }

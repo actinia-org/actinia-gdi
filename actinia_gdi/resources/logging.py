@@ -19,7 +19,7 @@ def createLogger():
     # create logger, set level and define format
     log.setLevel(getattr(logging, LOGCONFIG.level))
     logformat = ColoredFormatter(
-      '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)s.%(module)-10s -'
+        '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)s.%(module)-10s -'
       '%(message)s [in %(pathname)s:%(lineno)d]%(reset)s'
     )
 
@@ -37,7 +37,7 @@ def createLogger():
 def createWerkzeugLogger():
     werkzeugLog.setLevel(getattr(logging, LOGCONFIG.level))
     werkzeugLogformat = ColoredFormatter(
-      '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)-22s -'
+        '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)-22s -'
       '%(message)s %(reset)s'
     )
 
