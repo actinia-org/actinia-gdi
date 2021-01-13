@@ -52,8 +52,8 @@ listModules_get_docs = {
         }
     }
 }
-Module={}
-ProcessingErrorResponseModel={}
+Module = {}
+ProcessingErrorResponseModel = {}
 
 describeModule_get_docs = {
     'tags': ['Module Management'],
