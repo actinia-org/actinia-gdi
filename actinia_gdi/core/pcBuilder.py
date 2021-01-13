@@ -178,7 +178,7 @@ def buildPCS1Grd(preProcessChain):
     S1A_name = preProcessChain.get('title')
     raw_path = ACTINIACORE.filestorage + '/' + 'sentinel1/raw/'
     preprocessing_path = (ACTINIACORE.filestorage + '/'
-                         + 'sentinel1/preprocessing/')
+                          + 'sentinel1/preprocessing/')
 
     if (user is None
             or pw is None
