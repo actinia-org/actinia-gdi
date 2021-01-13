@@ -232,4 +232,5 @@ class Configfile:
             if config.has_option("FILEUPLOAD", "templates"):
                 FILEUPLOAD.templates = config.get("FILEUPLOAD", "templates")
 
+
 init = Configfile()
