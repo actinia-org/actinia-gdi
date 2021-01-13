@@ -167,5 +167,5 @@ class ModuleList(Schema):
         "id": "v.random",
         "description": "Generates random 2D/3D vector points.",
         "categories": ["vector", "sampling", "statistics", "random", "point pattern", "stratified random sampling", "level1"]}
-        ], "status": "success"}
+    ], "status": "success"}
     required = ["status", "processes"]
