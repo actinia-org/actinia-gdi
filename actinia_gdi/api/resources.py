@@ -82,5 +82,5 @@ class Update(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error'
-                )))
+            )))
             return make_response(res, 404)

@@ -121,7 +121,7 @@ class Job(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -154,7 +154,7 @@ class JobId(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Not Found: ' + request.url
-                )))
+            )))
             return make_response(res, 404)
 
     def post(self):
@@ -202,5 +202,5 @@ class JobIdCancel(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Not Found: ' + request.url
-                )))
+            )))
             return make_response(res, 404)

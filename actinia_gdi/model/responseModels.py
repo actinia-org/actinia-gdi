@@ -155,4 +155,4 @@ class ExceptionTracebackModel(Schema):
         "type": "exceptions.Exception",
         "traceback": "File \"main.py\", line 2, in <module>\n    raise" +
                      " Exception(\"Error\")\n"
-        }
+    }

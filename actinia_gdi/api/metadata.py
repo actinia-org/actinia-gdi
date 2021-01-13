@@ -77,7 +77,7 @@ class RawTags(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for tags "' + tags + '".'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -106,7 +106,7 @@ class RawCat(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Category "' + category + '" not found.'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -130,7 +130,7 @@ class RawUuid(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for uuid "' + uuid + '".'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -153,7 +153,7 @@ class Tags(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for tags "' + tags + '".'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -177,7 +177,7 @@ class Uuid(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for uuid "' + uuid + '".'
-                )))
+            )))
             return make_response(res, 404)
 
 
@@ -205,5 +205,5 @@ class UpdateUuid(Resource):
             res = (jsonify(SimpleStatusCodeResponseModel(
                 status=404,
                 message='Error looking for uuid "' + uuid + '".'
-                )))
+            )))
             return make_response(res, 404)
