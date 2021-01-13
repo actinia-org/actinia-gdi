@@ -77,7 +77,7 @@ def buildLoop(preProcessChain):
     log.debug("Registering own webhook endpoint: " + str(webhookUrl))
 
     tpl = tplEnv.get_template(
-            'actiniaCore/pc_loop.json'
+        'actiniaCore/pc_loop.json'
     )
 
     class PCInputClass():

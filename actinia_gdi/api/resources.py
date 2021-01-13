@@ -80,7 +80,7 @@ class Update(Resource):
             return make_response(jsonify(job), 200)
         else:
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error'
-                   )))
+                status=404,
+                message='Error'
+                )))
             return make_response(res, 404)
