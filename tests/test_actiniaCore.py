@@ -70,7 +70,6 @@ class ActiniaCoreApiTest(unittest.TestCase):
         assert type(resp) is Response
         assert resp.status_code == respStatusCode
 
-
     def test_postActiniaCore(self):
         app.testing = True
         self.app = app.test_client()
