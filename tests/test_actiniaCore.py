@@ -34,6 +34,7 @@ from actinia_gdi.main import app
 from actinia_gdi.core.actiniaCore import postActiniaCore, cancelActiniaCore
 from actinia_gdi.core.jobtable import getJobById
 
+
 class ActiniaCoreApiTest(unittest.TestCase):
 
     def test_Connection_get(self):

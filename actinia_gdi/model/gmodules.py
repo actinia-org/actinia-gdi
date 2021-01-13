@@ -98,11 +98,13 @@ class ModuleReturns(ModuleParameter):
     type = ModuleParameter.type
     description = "The data that is returned from this process."
 
+
 class ModuleImportDescription(ModuleParameter):
     properties = ModuleParameter.properties
     required = ModuleParameter.required
     type = ModuleParameter.type
     description = "Import parameters to import data for this process."
+
 
 class ModuleExportDescription(ModuleParameter):
     properties = ModuleParameter.properties
