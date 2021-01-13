@@ -186,7 +186,7 @@ def buildPCS1Grd(preProcessChain):
         or raw_path is None
         or preprocessing_path is None
         or webhookUrl is None
-    ):
+        ):
         log.error('Could not set all variables to replace in template.')
         return None
 
