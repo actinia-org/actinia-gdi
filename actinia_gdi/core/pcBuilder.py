@@ -77,7 +77,7 @@ def buildLoop(preProcessChain):
     log.debug("Registering own webhook endpoint: " + str(webhookUrl))
 
     tpl = tplEnv.get_template(
-            'actiniaCore/pc_loop.json'
+        'actiniaCore/pc_loop.json'
     )
 
     class PCInputClass():
@@ -160,7 +160,6 @@ def buildPCDummy(preProcessChain):
     return postbody
 
 
-
 def buildPCS1Grd(preProcessChain):
 
     processType = preProcessChain.get('processType')
@@ -178,15 +177,15 @@ def buildPCS1Grd(preProcessChain):
     S1A_name = preProcessChain.get('title')
     raw_path = ACTINIACORE.filestorage + '/' + 'sentinel1/raw/'
     preprocessing_path = (ACTINIACORE.filestorage + '/'
-                         + 'sentinel1/preprocessing/')
+                          + 'sentinel1/preprocessing/')
 
     if (user is None
-        or pw is None
-        or S1A_name is None
-        or raw_path is None
-        or preprocessing_path is None
-        or webhookUrl is None
-    ):
+            or pw is None
+            or S1A_name is None
+            or raw_path is None
+            or preprocessing_path is None
+            or webhookUrl is None
+            ):
         log.error('Could not set all variables to replace in template.')
         return None
 

@@ -65,7 +65,7 @@ def insertNewJob(
         process,
         feature_type,
         actiniaCoreResp
-        ):
+):
     """Insert new job into jobtabelle.
 
     Args:

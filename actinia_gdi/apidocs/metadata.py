@@ -75,8 +75,8 @@ rawTags_get_docs = {
         "GeoNetwork"
     ],
     "parameters": [
-      {
-        "in": "path",
+        {
+            "in": "path",
         "name": "tags",
         "type": "string",
         "description": "One or more Geonetwork tags, comma separated",
@@ -106,8 +106,8 @@ rawCategory_get_docs = {
         "GeoNetwork"
     ],
     "parameters": [
-      {
-        "in": "path",
+        {
+            "in": "path",
         "name": "category",
         "type": "string",
         "description": "A Geonetwork category",
@@ -136,8 +136,8 @@ rawUuid_get_docs = {
         "GeoNetwork"
     ],
     "parameters": [
-      {
-        "in": "path",
+        {
+            "in": "path",
         "name": "uuid",
         "type": "string",
         "description": "A Geonetwork uuid from a record",
@@ -162,8 +162,8 @@ tags_get_docs = {
         "GeoNetwork"
     ],
     "parameters": [
-      {
-        "in": "path",
+        {
+            "in": "path",
         "name": "tags",
         "type": "string",
         "description": "One or more Geonetwork tags, comma separated",
@@ -186,8 +186,8 @@ uuid_get_docs = {
         "GeoNetwork"
     ],
     "parameters": [
-      {
-        "in": "path",
+        {
+            "in": "path",
         "name": "uuid",
         "type": "string",
         "description": "A Geonetwork uuid from a record",

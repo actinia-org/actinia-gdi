@@ -75,9 +75,9 @@ class RawTags(Resource):
             return res
         except Exception:
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error looking for tags "' + tags + '".'
-                   )))
+                status=404,
+                message='Error looking for tags "' + tags + '".'
+            )))
             return make_response(res, 404)
 
 
@@ -104,9 +104,9 @@ class RawCat(Resource):
         except Exception as e:
             log.error('ERROR: ' + repr(e) + " - " + str(e))
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Category "' + category + '" not found.'
-                   )))
+                status=404,
+                message='Category "' + category + '" not found.'
+            )))
             return make_response(res, 404)
 
 
@@ -128,9 +128,9 @@ class RawUuid(Resource):
             return res
         except Exception:
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error looking for uuid "' + uuid + '".'
-                   )))
+                status=404,
+                message='Error looking for uuid "' + uuid + '".'
+            )))
             return make_response(res, 404)
 
 
@@ -151,9 +151,9 @@ class Tags(Resource):
             return res
         except Exception:
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error looking for tags "' + tags + '".'
-                   )))
+                status=404,
+                message='Error looking for tags "' + tags + '".'
+            )))
             return make_response(res, 404)
 
 
@@ -175,9 +175,9 @@ class Uuid(Resource):
             return res
         except Exception:
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error looking for uuid "' + uuid + '".'
-                   )))
+                status=404,
+                message='Error looking for uuid "' + uuid + '".'
+            )))
             return make_response(res, 404)
 
 
@@ -203,7 +203,7 @@ class UpdateUuid(Resource):
             log.error('error parsing gnos response')
             log.error(e)
             res = (jsonify(SimpleStatusCodeResponseModel(
-                        status=404,
-                        message='Error looking for uuid "' + uuid + '".'
-                   )))
+                status=404,
+                message='Error looking for uuid "' + uuid + '".'
+            )))
             return make_response(res, 404)

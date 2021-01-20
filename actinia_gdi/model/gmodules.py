@@ -60,7 +60,7 @@ class ModuleParameterSchema(Schema):
         'enum': {
             'type': 'array',
             'items': {
-               'type': 'string'
+                'type': 'string'
             },
             'description': ''
         }
@@ -98,11 +98,13 @@ class ModuleReturns(ModuleParameter):
     type = ModuleParameter.type
     description = "The data that is returned from this process."
 
+
 class ModuleImportDescription(ModuleParameter):
     properties = ModuleParameter.properties
     required = ModuleParameter.required
     type = ModuleParameter.type
     description = "Import parameters to import data for this process."
+
 
 class ModuleExportDescription(ModuleParameter):
     properties = ModuleParameter.properties
@@ -167,5 +169,5 @@ class ModuleList(Schema):
         "id": "v.random",
         "description": "Generates random 2D/3D vector points.",
         "categories": ["vector", "sampling", "statistics", "random", "point pattern", "stratified random sampling", "level1"]}
-        ], "status": "success"}
+    ], "status": "success"}
     required = ["status", "processes"]

@@ -34,6 +34,7 @@ from actinia_gdi.main import app
 from actinia_gdi.core.actiniaCore import postActiniaCore, cancelActiniaCore
 from actinia_gdi.core.jobtable import getJobById
 
+
 class ActiniaCoreApiTest(unittest.TestCase):
 
     def test_Connection_get(self):
@@ -68,7 +69,6 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         assert type(resp) is Response
         assert resp.status_code == respStatusCode
-
 
     def test_postActiniaCore(self):
         app.testing = True
