@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ Extension of actinia_cores ephemeral_processing_with_export AsyncEphemeralExport
 
 __license__ = "Apache-2.0"
 __author__ = "Anika Bettge, Sören Gebbert"
-__copyright__ = "Copyright 2016-2018, Sören Gebbert and mundialis GmbH & Co. KG"
+__copyright__ = "Copyright 2016-2019, Sören Gebbert and mundialis GmbH & Co. KG"
 __maintainer__ = "mundialis"
 
 
