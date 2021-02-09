@@ -36,6 +36,7 @@ from actinia_gdi.resources.templating import tplEnv
 
 def logstring(module_id, param, key):
     log.debug(module_id + " " + param + " has no key " + key)
+    pass
 
 
 def setParameterKey(module_id, parameter):
@@ -76,15 +77,31 @@ def setParameterDescription(module_id, key, parameter, kwargs):
     return kwargs
 
 
-def setParameterRequired(parameter, kwargs):
+def setParameterName(key, kwargs):
+    kwargs['name'] = key
+    return kwargs
+
+
+def setParameterOptional(parameter, kwargs):
     try:
         required = parameter['@required']
         if required == 'yes':
-            kwargs['required'] = True
+            kwargs['optional'] = False
         else:
-            kwargs['required'] = False
+            kwargs['optional'] = True
     except KeyError:
         required = "False"
+
+    return kwargs
+
+
+def setParameterDefault(parameter, kwargs):
+    try:
+        kwargs['default'] = parameter['default']
+        if parameter['default'] is None:
+            kwargs['default'] = ''
+    except KeyError:
+        pass
 
     return kwargs
 
@@ -110,17 +127,6 @@ def setParamType(module_id, key, parameter, schema_kwargs):
             if subtype_key == "@element":
                 schema_kwargs['subtype'] = val
     except Exception:
-        pass
-
-    return schema_kwargs
-
-
-def setParameterDefault(parameter, schema_kwargs):
-    try:
-        schema_kwargs['default'] = parameter['default']
-        if parameter['default'] is None:
-            schema_kwargs['default'] = ''
-    except KeyError:
         pass
 
     return schema_kwargs
@@ -157,6 +163,51 @@ def isOutput(parameter):
         return False
 
 
+def createModuleParameterFromGrassParam(module_id, key, parameter):
+    kwargs = dict()
+    schema_kwargs = dict()
+
+    schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
+    kwargs = setParameterDescription(module_id, key, parameter, kwargs)
+    kwargs = setParameterName(key, kwargs)
+    kwargs = setParameterOptional(parameter, kwargs)
+    kwargs = setParameterDefault(parameter, kwargs)
+    schema_kwargs = setParameterEnum(parameter, schema_kwargs)
+
+    param_object = ModuleParameter(
+        **kwargs,
+        schema=ModuleParameterSchema(**schema_kwargs)
+    )
+
+    del kwargs
+    del schema_kwargs
+
+    return param_object
+
+
+def createModuleParameterFromGrassFlag(module_id, key, parameter):
+
+    kwargs = dict()
+    kwargs['default'] = 'False'
+    schema_kwargs = dict()
+    schema_kwargs['type'] = 'boolean'
+
+    key = setParameterKey(module_id, parameter)
+
+    kwargs = setParameterDescription(module_id, key, parameter, kwargs)
+    kwargs = setParameterName(key, kwargs)
+    kwargs = setParameterOptional(parameter, kwargs)
+
+    param_object = ModuleParameter(
+        **kwargs,
+        schema=ModuleParameterSchema(**schema_kwargs)
+    )
+    del kwargs
+    del schema_kwargs
+
+    return param_object
+
+
 def ParseInterfaceDescription(xml_string, keys=None):
     """Parses output of GRASS interface-description
     and returns openEO process object
@@ -168,8 +219,8 @@ def ParseInterfaceDescription(xml_string, keys=None):
     description = gm_dict['description']
     categories = gm_dict['keywords'].replace(' ', '').split(',')
     categories.append('grass-module')
-    parameters = {}
-    returns = {}
+    parameters = []
+    returns = []
     extrakwargs = dict()
 
     try:
@@ -185,10 +236,6 @@ def ParseInterfaceDescription(xml_string, keys=None):
         flags = []
 
     for parameter in grass_params:
-
-        kwargs = dict()
-        schema_kwargs = dict()
-
         if keys:
             # case for actinia modules
             key = setVirtualParameterKey(module_id, parameter)
@@ -205,45 +252,22 @@ def ParseInterfaceDescription(xml_string, keys=None):
             # case for GRASS modules
             key = setParameterKey(module_id, parameter)
 
-        schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
-        kwargs = setParameterDescription(module_id, key, parameter, kwargs)
-        kwargs = setParameterRequired(parameter, kwargs)
-        schema_kwargs = setParameterDefault(parameter, schema_kwargs)
-        schema_kwargs = setParameterEnum(parameter, schema_kwargs)
-
-        param_object = ModuleParameter(
-            **kwargs,
-            schema=ModuleParameterSchema(**schema_kwargs)
-        )
+        param_object = createModuleParameterFromGrassParam(
+            module_id, key, parameter)
         if isOutput(parameter):
-            returns[key] = param_object
+            returns.append(param_object)
         else:
-            parameters[key] = param_object
-        del kwargs
-        del schema_kwargs
+            parameters.append(param_object)
 
     for parameter in flags:
         # not possible to specify flag values via template at the moment
         if keys:
             continue
+        param_object = createModuleParameterFromGrassFlag(
+            module_id, key, parameter)
 
-        kwargs = dict()
-        schema_kwargs = dict()
-        schema_kwargs['type'] = 'boolean'
-        schema_kwargs['default'] = 'False'
-
-        key = setParameterKey(module_id, parameter)
-
-        kwargs = setParameterDescription(module_id, key, parameter, kwargs)
-        kwargs = setParameterRequired(parameter, kwargs)
-
-        param_object = ModuleParameter(
-            **kwargs,
-            schema=ModuleParameterSchema(**schema_kwargs)
-        )
-        parameters[key] = param_object
-        del kwargs
-        del schema_kwargs
+        print(param_object['name'], key)
+        parameters.append(param_object)
 
     # custom extention for importer + exporter from actinia_core
     try:
@@ -255,7 +279,8 @@ def ParseInterfaceDescription(xml_string, keys=None):
                 extrakwargs[key][param] = ModuleParameter(**pc_template[key][param])
     except Exception as e:
         # if no template for module exist, use as is (default)
-        log.debug('template %s does not exist.', e)
+        # log.debug('template %s does not exist.', e)
+        pass
 
     grass_module = Module(
         id=module_id,
