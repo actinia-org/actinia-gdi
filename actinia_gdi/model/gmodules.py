@@ -53,10 +53,6 @@ class ModuleParameterSchema(Schema):
             'type': 'string',
             'description': ''
         },
-        'default': {
-            'type': 'string',
-            'description': ''
-        },
         'enum': {
             'type': 'array',
             'items': {
@@ -74,13 +70,21 @@ class ModuleParameter(Schema):
 
     type = 'object'
     properties = {
+        'name': {
+            'type': 'string',
+            'description': 'A unique name for the parameter. '
+        },
         'description': {
             'type': 'string',
             'description': 'Detailed description to fully explain the entity.'
         },
-        'required': {
+        'optional': {
             'type': 'boolean',
-            'description': 'Determines whether this parameter is mandatory. Default: false'
+            'description': 'Determines whether this parameter is mandatory. Default: true'
+        },
+        'default': {
+            'type': 'string',
+            'description': 'The default value for this parameter.'
         },
         'schema': ModuleParameterSchema
         # 'comment': {
@@ -89,7 +93,7 @@ class ModuleParameter(Schema):
         # }
     }
     description = 'A list of parameters that are applicable for this process.'
-    required = ["description", "schema"]
+    required = ["description", "schema", "name"]
 
 
 class ModuleReturns(ModuleParameter):

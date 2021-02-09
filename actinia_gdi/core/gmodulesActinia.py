@@ -330,6 +330,8 @@ class PlaceholderTransformer(object):
     def __init__(self):
         self.vm_params = {}  # parameter to build virtual module
         self.vm_returns = {}  # return values for virtual module
+        # self.vm_params = []  # parameter to build virtual module
+        # self.vm_returns = []  # return values for virtual module
         self.aggregated_keys = []
 
     def populate_vm_params_and_returns(self, gm, pc):
@@ -338,19 +340,17 @@ class PlaceholderTransformer(object):
         self.aks = self.aggregated_keys
 
         if 'parameters' in gm:
-            for param in gm['parameters']:
+            for gm_param_obj in gm['parameters']:
                 for ak in self.aks:
+                    param = gm_param_obj['name']
                     if param in ak:
                         amkey = self.aks[ak]['amkey']
-                        self.vm_params[amkey] = gm['parameters'][param]
-
+                        self.vm_params[amkey] = gm_param_obj
                         if (param in self.aks.keys()
                                 and 'enum' in self.aks[param]):
                             enum = self.aks[param]['enum']
-                            self.vm_params[amkey]['schema']['enum'] = enum
-
-                        add_param_description(
-                            self.vm_params[amkey], param, self.aks)
+                            gm_param_obj['schema']['enum'] = enum
+                        add_param_description(gm_param_obj, param, self.aks)
 
         if 'returns' in gm:
             for param in gm['returns']:
