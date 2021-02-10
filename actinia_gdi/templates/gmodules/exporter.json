@@ -1,8 +1,9 @@
 {
-    "export": {
-        "format": {
+    "export": [
+        {
+            "name": "format",
             "description": "The format of the output file",
-            "required": true,
+            "optional": false,
             "schema": {
                 "enum": [
                     "GTiff",
@@ -18,9 +19,10 @@
                 "type": "string"
             }
         },
-        "type": {
+        {
+            "name": "type",
             "description": "The type of the output",
-            "required": true,
+            "optional": false,
             "schema": {
                 "enum": [
                     "raster",
@@ -30,19 +32,21 @@
                 "type": "string"
             }
         },
-        "dbstring": {
+        {
+            "name": "dbstring",
             "description": "The database string to be used to connect to a PostgreSQL database for vector export.",
-            "required": false,
+            "optional": true,
             "schema": {
                 "type": "string"
             }
         },
-        "output_layer": {
+        {
+            "name": "output_layer",
             "description": "Name for output PostgreSQL layer.",
-            "required": false,
+            "optional": true,
             "schema": {
                 "type": "string"
             }
         }
-    }
+    ]
 }

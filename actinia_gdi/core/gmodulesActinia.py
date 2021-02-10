@@ -328,11 +328,12 @@ class PlaceholderCollector(object):
 class PlaceholderTransformer(object):
 
     def __init__(self):
-        self.vm_params = {}  # parameter to build virtual module
-        self.vm_returns = {}  # return values for virtual module
-        # self.vm_params = []  # parameter to build virtual module
-        # self.vm_returns = []  # return values for virtual module
+        self.vm_params = []  # parameter to build virtual module
+        self.vm_returns = []  # return values for virtual module
         self.aggregated_keys = []
+        self.used_amkeys = []
+        self.used_importkeys = []
+        self.used_exportkeys = []
 
     def populate_vm_params_and_returns(self, gm, pc):
 
@@ -341,48 +342,72 @@ class PlaceholderTransformer(object):
 
         if 'parameters' in gm:
             for gm_param_obj in gm['parameters']:
+                param = gm_param_obj['name']
                 for ak in self.aks:
-                    param = gm_param_obj['name']
-                    if param in ak:
-                        amkey = self.aks[ak]['amkey']
-                        self.vm_params[amkey] = gm_param_obj
-                        if (param in self.aks.keys()
-                                and 'enum' in self.aks[param]):
-                            enum = self.aks[param]['enum']
-                            gm_param_obj['schema']['enum'] = enum
-                        add_param_description(gm_param_obj, param, self.aks)
+                    if param not in ak:
+                        continue
+                    amkey = self.aks[ak]['amkey']
+                    if amkey in self.used_amkeys:
+                        continue
+                    self.used_amkeys.append(amkey)
+                    temp_dict = {}
+                    for key in gm_param_obj.keys():
+                        temp_dict[key] = gm_param_obj[key]
+                    temp_dict['name'] = amkey
+                    if (param in self.aks.keys()
+                            and 'enum' in self.aks[param]):
+                        enum = self.aks[param]['enum']
+                        temp_dict['schema']['enum'] = enum
+                    add_param_description(temp_dict, param, self.aks)
+                    self.vm_params.append(temp_dict)
 
         if 'returns' in gm:
-            for param in gm['returns']:
+            for gm_return_obj in gm['returns']:
+                param = gm_return_obj['name']
                 if param in self.aks.keys():
                     amkey = self.aks[param]['amkey']
-                    if amkey in self.vm_params:
-                        pass
-                    else:
-                        self.vm_returns[amkey] = gm['returns'][param]
-
-                        add_param_description(
-                            self.vm_returns[amkey], param, pc.input_dict)
+                    if amkey in self.used_amkeys:
+                        continue
+                    self.used_amkeys.append(amkey)
+                    temp_dict = {}
+                    for key in gm_return_obj.keys():
+                        temp_dict[key] = gm_return_obj[key]
+                    temp_dict['name'] = amkey
+                    add_param_description(temp_dict, param, self.aks)
+                    self.vm_returns.append(temp_dict)
 
         if 'import_descr' in gm:
-            for param in gm['import_descr']:
+            for gm_import_obj in gm['import_descr']:
+                param = gm_import_obj['name']
                 for key, val in pc.import_descr_dict.items():
                     if param == val:
-                        self.vm_params[key] = gm['import_descr'][val]
-
+                        if key in self.used_importkeys:
+                            continue
+                        self.used_importkeys.append(key)
+                        temp_dict = {}
+                        for k in gm_import_obj.keys():
+                            temp_dict[k] = gm_import_obj[k]
+                        temp_dict['name'] = key
                         add_param_description(
-                            self.vm_params[key], 'import_descr_' + param,
+                            temp_dict, 'import_descr_' + param,
                             pc.import_descr_dict)
+                        self.vm_params.append(temp_dict)
 
         if 'exporter' in gm:
-            for param in gm['exporter']:
+            for gm_export_obj in gm['exporter']:
+                param = gm_export_obj['name']
                 for key, val in pc.exporter_dict.items():
                     if param == val:
-                        self.vm_returns[key] = gm['exporter'][val]
-
+                        if key in self.used_exportkeys:
+                            continue
+                        self.used_exportkeys.append(key)
+                        temp_dict = {}
+                        for k in gm_export_obj.keys():
+                            temp_dict[k] = gm_export_obj[k]
+                        temp_dict['name'] = key
                         add_param_description(
-                            self.vm_returns[key], 'exporter' + param,
-                            pc.exporter_dict)
+                            temp_dict, 'exporter' + param, pc.exporter_dict)
+                        self.vm_returns.append(temp_dict)
 
     def transformPlaceholder(self, placeholderCollector):
         """Loops over moduleCollection filled by loop_list_items and enriches
@@ -448,10 +473,17 @@ def createActiniaModule(resourceBaseSelf, processchain):
     pt = PlaceholderTransformer()
     pt.transformPlaceholder(pc)
 
+    vm_params = []
+    vm_returns = []
+    for i in pt.vm_params:
+        vm_params.append(i['name'])
+    for i in pt.vm_returns:
+        vm_returns.append(i['name'])
+
     # case when nested actinia_module is found and no interface description
     # was run
     for undefitem in undef:
-        if undefitem not in pt.vm_params and undefitem not in pt.vm_returns:
+        if undefitem not in vm_params and undefitem not in vm_returns:
             child_pt = PlaceholderTransformer()
             for child_pc in pc.child_pcs:
                 # this will populate child_pt.vm_params and child_pt.vm_returns
@@ -460,12 +492,22 @@ def createActiniaModule(resourceBaseSelf, processchain):
                 # TODO: confirm that there cannot be multiple placeholders in
                 # one value of an actinia_module (95% sure)
                 if nm.placeholders[0] == undefitem:
-                    if nm.param in child_pt.vm_params.keys():
-                        print('param')
-                        pt.vm_params[undefitem] = child_pt.vm_params[nm.param]
-                    else:
-                        print('return')
-                        pt.vm_returns[undefitem] = child_pt.vm_returns[nm.param]
+
+                    for i in child_pt.vm_params:
+                        if i['name'] == nm.param:
+                            temp_dict = {}
+                            for key in i.keys():
+                                temp_dict[key] = i[key]
+                            temp_dict['name'] = undefitem
+                            pt.vm_params.append(temp_dict)
+
+                    for i in child_pt.vm_returns:
+                        if i['name'] == nm.param:
+                            temp_dict = {}
+                            for key in i.keys():
+                                temp_dict[key] = i[key]
+                            temp_dict['name'] = undefitem
+                            pt.vm_returns.append(temp_dict)
 
     virtual_module = Module(
         id=pc_template['id'],
