@@ -251,7 +251,6 @@ def ParseInterfaceDescription(xml_string, keys=None):
         else:
             # case for GRASS modules
             key = setParameterKey(module_id, parameter)
-
         param_object = createModuleParameterFromGrassParam(
             module_id, key, parameter)
         if isOutput(parameter):
@@ -266,17 +265,17 @@ def ParseInterfaceDescription(xml_string, keys=None):
         param_object = createModuleParameterFromGrassFlag(
             module_id, key, parameter)
 
-        print(param_object['name'], key)
         parameters.append(param_object)
 
     # custom extention for importer + exporter from actinia_core
+    # Runs when viewing importer/exporter as module and when used in template.
     try:
         tpl = tplEnv.get_template('gmodules/' + module_id + '.json')
         pc_template = json.loads(tpl.render().replace('\n', ''))
         for key in [*pc_template]:
-            extrakwargs[key] = {}
+            extrakwargs[key] = []
             for param in pc_template[key]:
-                extrakwargs[key][param] = ModuleParameter(**pc_template[key][param])
+                extrakwargs[key].append(ModuleParameter(**param))
     except Exception as e:
         # if no template for module exist, use as is (default)
         # log.debug('template %s does not exist.', e)

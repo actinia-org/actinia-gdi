@@ -1,8 +1,9 @@
 {
-    "import_descr": {
-        "type": {
+    "import_descr": [
+        {
+            "name": "type",
             "description": "The type of the input that should be downloaded and imported.",
-            "required": false,
+            "optional": true,
             "schema": {
                 "enum": [
                     "raster",
@@ -15,9 +16,10 @@
                 "type": "string"
             }
         },
-        "sentinel_band": {
+        {
+            "name": "sentinel_band",
             "description": "The band of the sentinel2 scene that should be imported",
-            "required": false,
+            "optional": true,
             "schema": {
                 "enum": [
                     "B01",
@@ -37,9 +39,10 @@
                 "type": "string"
             }
         },
-        "landsat_atcor": {
+        {
+            "name": "landsat_atcor",
             "description": "The atmospheric correction that should be applied to the landsat scene",
-            "required": false,
+            "optional": true,
             "schema": {
                 "enum": [
                     "uncorrected",
@@ -52,26 +55,29 @@
                 "type": "string"
             }
         },
-        "vector_layer": {
+        {
+            "name": "vector_layer",
             "description": "The name of the layer that should be imported form the vector file or postGIS database",
-            "required": false,
+            "optional": true,
             "schema": {
                 "type": "string"
             }
         },
-        "source": {
+        {
+            "name": "source",
             "description": "The input source that may be a landsat scene name, a sentinel2 scene name, a postGIS database string, or an URL that points to an accessible raster or vector file",
-            "required": false,
+            "optional": true,
             "schema": {
                 "type": "string"
             }
         },
-        "basic_auth": {
+        {
+            "name": "basic_auth",
             "description": "User name and password for basic HTTP, HTTPS and FTP authentication of the source connection.",
-            "required": false,
+            "optional": true,
             "schema": {
                 "type": "string"
             }
         }
-    }
+    ]
 }
