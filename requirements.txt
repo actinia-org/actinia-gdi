@@ -1,3 +1,7 @@
+# These requirements are only necessary when actinia-gdi is used as standalone
+# app. In case of installation as actinia-core plugin, the requirements are
+# defined in setup.py.
+
 colorlog>=3.1.4
 Flask>=0.12.3
 Flask-Cors>=3.0.3
