@@ -67,7 +67,7 @@ class ActiniaModuleId(ResourceBase):
 
     # @swagger.doc(TODO)
     def get(self, module_id):
-        """Describe an actinia module (process chain templat).
+        """Describe an actinia module (process chain template).
         """
         actinia_module = readActiniaModule(module_id)
         if actinia_module is not False:
@@ -81,7 +81,7 @@ class ActiniaModuleId(ResourceBase):
 
     # @swagger.doc(TODO)
     def put(self, module_id):
-        """Update an actinia module (process chain templat).
+        """Update an actinia module (process chain template).
         """
         actinia_module = updateActiniaModule(
             module_id, request.get_json(force=True))
@@ -96,7 +96,7 @@ class ActiniaModuleId(ResourceBase):
 
     # @swagger.doc(TODO)
     def delete(self, module_id):
-        """Delete an actinia module (process chain templat).
+        """Delete an actinia module (process chain template).
         """
         resp = deleteActiniaModule(module_id)
         if resp is True:
