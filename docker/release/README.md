@@ -1,3 +1,5 @@
+### Only kept for reference - currently travis takes care of building the wheel
+
 To create a new release, you can use this docker to build the wheel and add
 to the release.
 

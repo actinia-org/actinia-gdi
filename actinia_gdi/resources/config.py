@@ -188,10 +188,10 @@ class Configfile:
                     config.has_option("GEONETWORK", "csw_publication")):
 
                 GEONETWORK.csw_publication = (GEONETWORK.scheme + '://' +
-                                      GEONETWORK.host + ':' +
-                                      GEONETWORK.port +
-                                      GEONETWORK.base_path +
-                                      GEONETWORK.csw_publication)
+                                              GEONETWORK.host + ':' +
+                                              GEONETWORK.port +
+                                              GEONETWORK.base_path +
+                                              GEONETWORK.csw_publication)
 
         # LOGGING
         if config.has_section("LOGCONFIG"):
@@ -234,5 +234,6 @@ class Configfile:
                 FILEUPLOAD.geodata = config.get("FILEUPLOAD", "geodata")
             if config.has_option("FILEUPLOAD", "templates"):
                 FILEUPLOAD.templates = config.get("FILEUPLOAD", "templates")
+
 
 init = Configfile()

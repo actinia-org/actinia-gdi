@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-The logger
+Logging interface
 """
 
-__author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
+__author__ = "Carmen Tawalika"
+__copyright__ = "Copyright 2019-2021, mundialis"
+__maintainer__ = "Carmen Tawalika"
 
 
 import logging
@@ -30,7 +31,6 @@ from logging import FileHandler
 
 from colorlog import ColoredFormatter
 from pythonjsonlogger import jsonlogger
-from werkzeug.serving import WSGIRequestHandler
 
 from actinia_gdi.resources.config import LOGCONFIG
 
@@ -46,9 +46,9 @@ gunicornLog = logging.getLogger('gunicorn')
 def setLogFormat(veto=None):
     logformat = ""
     if LOGCONFIG.type == 'json' and not veto:
-        logformat = CustomJsonFormatter('(time) (level) (component) (module)'
-                                        '(message) (pathname) (lineno)'
-                                        '(processName) (threadName)')
+        logformat = CustomJsonFormatter('%(time) %(level) %(component) %(module)'
+                                        '%(message) %(pathname) %(lineno)'
+                                        '%(processName) %(threadName)')
     else:
         logformat = ColoredFormatter(
             '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)s.%(module)-'
@@ -63,7 +63,6 @@ def setLogHandler(logger, type, format):
     elif type == 'file':
         # For readability, json is never written to file
         handler = FileHandler(LOGCONFIG.logfile)
-
     handler.setFormatter(format)
     logger.addHandler(handler)
 

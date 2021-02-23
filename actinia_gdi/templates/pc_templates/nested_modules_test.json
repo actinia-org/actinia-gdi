@@ -1,0 +1,88 @@
+{
+	"id": "nested_modules_test",
+	"description": "PC makes no sense but includes a lot of cases for testing self-description",
+	"template": {
+		"list": [
+			{
+				"id": "import_training_data",
+				"comment": "Tested with layers: actinia_data.trdata_polygons and actinia_data.trdata_points",
+				"module": "v.import",
+				"inputs": [
+					{
+						"param": "input",
+						"value": "{{ db_connection }}"
+					},
+					{
+						"param": "layer",
+						"value": "{{ layer }}"
+					},
+					{
+						"param": "output",
+						"value": "user_tr_data"
+					}
+				]
+			},
+			{
+				"id": "index_NDVI",
+				"module": "index_NDVI",
+				"inputs": [
+					{
+						"param": "output",
+						"value": "ndvi"
+					},
+					{
+						"param": "red",
+						"value": "{{ B04_mosaic }}"
+					},
+					{
+						"param": "nir",
+						"value": "B08_mosaic"
+					}
+				]
+			},
+			{
+				"id": "slope_aspect",
+				"module": "slope_aspect",
+				"inputs": [
+					{
+						"param": "datatype",
+						"value": "FCELL"
+					},
+					{
+						"param": "name_of_output_slope",
+						"value": "{{ output_slope_name }}"
+					},
+					{
+						"param": "name_of_output_aspect",
+						"value": "aspect"
+					}
+				]
+			},
+			{
+				"id": "point_in_polygon",
+				"module": "point_in_polygon",
+				"inputs": [
+					{
+						"param": "url_to_geojson_point",
+						"value": "{{ url_to_geojson_point }}"
+					}
+				]
+			},
+			{
+				"id": "r_colors",
+				"module": "r.colors",
+				"inputs": [
+					{
+						"param": "map",
+						"value": "{{ output }}"
+					},
+					{
+						"param": "color",
+						"value": "random"
+					}
+				]
+			}
+		],
+		"version": "1"
+	}
+}

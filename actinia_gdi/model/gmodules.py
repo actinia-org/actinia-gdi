@@ -53,14 +53,10 @@ class ModuleParameterSchema(Schema):
             'type': 'string',
             'description': ''
         },
-        'default': {
-            'type': 'string',
-            'description': ''
-        },
         'enum': {
             'type': 'array',
             'items': {
-               'type': 'string'
+                'type': 'string'
             },
             'description': ''
         }
@@ -74,13 +70,21 @@ class ModuleParameter(Schema):
 
     type = 'object'
     properties = {
+        'name': {
+            'type': 'string',
+            'description': 'A unique name for the parameter. '
+        },
         'description': {
             'type': 'string',
             'description': 'Detailed description to fully explain the entity.'
         },
-        'required': {
+        'optional': {
             'type': 'boolean',
-            'description': 'Determines whether this parameter is mandatory. Default: false'
+            'description': 'Determines whether this parameter is mandatory. Default: true'
+        },
+        'default': {
+            'type': 'string',
+            'description': 'The default value for this parameter.'
         },
         'schema': ModuleParameterSchema
         # 'comment': {
@@ -89,7 +93,7 @@ class ModuleParameter(Schema):
         # }
     }
     description = 'A list of parameters that are applicable for this process.'
-    required = ["description", "schema"]
+    required = ["description", "schema", "name"]
 
 
 class ModuleReturns(ModuleParameter):
@@ -98,11 +102,13 @@ class ModuleReturns(ModuleParameter):
     type = ModuleParameter.type
     description = "The data that is returned from this process."
 
+
 class ModuleImportDescription(ModuleParameter):
     properties = ModuleParameter.properties
     required = ModuleParameter.required
     type = ModuleParameter.type
     description = "Import parameters to import data for this process."
+
 
 class ModuleExportDescription(ModuleParameter):
     properties = ModuleParameter.properties
@@ -167,5 +173,5 @@ class ModuleList(Schema):
         "id": "v.random",
         "description": "Generates random 2D/3D vector points.",
         "categories": ["vector", "sampling", "statistics", "random", "point pattern", "stratified random sampling", "level1"]}
-        ], "status": "success"}
+    ], "status": "success"}
     required = ["status", "processes"]

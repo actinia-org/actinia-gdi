@@ -24,8 +24,8 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
-import pytest
 import unittest
+import pytest
 import json
 from flask import Response
 
@@ -33,6 +33,7 @@ from actinia_gdi.main import app
 
 from actinia_gdi.core.actiniaCore import postActiniaCore, cancelActiniaCore
 from actinia_gdi.core.jobtable import getJobById
+
 
 class ActiniaCoreApiTest(unittest.TestCase):
 
@@ -69,14 +70,13 @@ class ActiniaCoreApiTest(unittest.TestCase):
         assert type(resp) is Response
         assert resp.status_code == respStatusCode
 
-
     def test_postActiniaCore(self):
         app.testing = True
         self.app = app.test_client()
 
         respStatusCode = 200
 
-        with open('tests/resources/postbody.processes.success.json') as jsonfile:
+        with open('tests/resources/standalone_app/postbody.processes.success.json') as jsonfile:
             postBody = json.load(jsonfile)
 
         resp = self.app.post('/processes/test/jobs',
@@ -92,7 +92,7 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         respStatusCode = 500
 
-        with open('tests/resources/postbody.processes.failure.json') as jsonfile:
+        with open('tests/resources/standalone_app/postbody.processes.failure.json') as jsonfile:
             postBody = json.load(jsonfile)
 
         resp = self.app.post('/processes/test/jobs',
@@ -106,7 +106,7 @@ class ActiniaCoreApiTest(unittest.TestCase):
 class ActiniaCoreCoreTest(unittest.TestCase):
     def test_postActiniaCore(self):
 
-        with open('tests/resources/postbody.processes.success.json') as jsonfile:
+        with open('tests/resources/standalone_app/postbody.processes.success.json') as jsonfile:
             jsonDict = json.load(jsonfile)
 
         process = postActiniaCore('test', jsonDict, 'http://127.0.0.1:5000')

@@ -1,30 +1,30 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#######
-# actinia-core - an open source REST API for scalable, distributed, high
-# performance processing of geographical data that uses GRASS GIS for
-# computational tasks. For details, see https://actinia.mundialis.de/
-#
-# Copyright (c) 2016-2018 Sören Gebbert and mundialis GmbH & Co. KG
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#
-#######
-
 """
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
 Module management to parser GRASS xml response
-
 """
+
+__license__ = "Apache-2.0"
+__author__ = "Carmen Tawalika"
+__copyright__ = "Copyright 2019, mundialis"
+__maintainer__ = "Carmen Tawalika"
+
+
 import json
 import xmltodict
 
@@ -34,14 +34,9 @@ from actinia_gdi.resources.logging import log
 from actinia_gdi.resources.templating import tplEnv
 
 
-__license__ = "GPLv3"
-__author__ = "Carmen Tawalika"
-__copyright__ = "Copyright 2019, mundialis"
-__maintainer__ = "Carmen Tawalika"
-
-
 def logstring(module_id, param, key):
     log.debug(module_id + " " + param + " has no key " + key)
+    pass
 
 
 def setParameterKey(module_id, parameter):
@@ -68,13 +63,13 @@ def setParameterDescription(module_id, key, parameter, kwargs):
     param_descr = ""
 
     try:
-        param_descr = parameter['label']
+        param_descr = parameter['label'] + ". "
         kwargs['description'] = param_descr
     except KeyError:
         # logstring(module_id, key, "label")
         pass
     try:
-        param_descr += '. ' + parameter['description']
+        param_descr += parameter['description'] + ". "
         kwargs['description'] = param_descr
     except KeyError:
         logstring(module_id, key, "description")
@@ -82,15 +77,31 @@ def setParameterDescription(module_id, key, parameter, kwargs):
     return kwargs
 
 
-def setParameterRequired(parameter, kwargs):
+def setParameterName(key, kwargs):
+    kwargs['name'] = key
+    return kwargs
+
+
+def setParameterOptional(parameter, kwargs):
     try:
         required = parameter['@required']
         if required == 'yes':
-            kwargs['required'] = True
+            kwargs['optional'] = False
         else:
-            kwargs['required'] = False
+            kwargs['optional'] = True
     except KeyError:
         required = "False"
+
+    return kwargs
+
+
+def setParameterDefault(parameter, kwargs):
+    try:
+        kwargs['default'] = parameter['default']
+        if parameter['default'] is None:
+            kwargs['default'] = ''
+    except KeyError:
+        pass
 
     return kwargs
 
@@ -116,17 +127,6 @@ def setParamType(module_id, key, parameter, schema_kwargs):
             if subtype_key == "@element":
                 schema_kwargs['subtype'] = val
     except Exception:
-        pass
-
-    return schema_kwargs
-
-
-def setParameterDefault(parameter, schema_kwargs):
-    try:
-        schema_kwargs['default'] = parameter['default']
-        if parameter['default'] is None:
-            schema_kwargs['default'] = ''
-    except KeyError:
         pass
 
     return schema_kwargs
@@ -163,6 +163,51 @@ def isOutput(parameter):
         return False
 
 
+def createModuleParameterFromGrassParam(module_id, key, parameter):
+    kwargs = dict()
+    schema_kwargs = dict()
+
+    schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
+    kwargs = setParameterDescription(module_id, key, parameter, kwargs)
+    kwargs = setParameterName(key, kwargs)
+    kwargs = setParameterOptional(parameter, kwargs)
+    kwargs = setParameterDefault(parameter, kwargs)
+    schema_kwargs = setParameterEnum(parameter, schema_kwargs)
+
+    param_object = ModuleParameter(
+        **kwargs,
+        schema=ModuleParameterSchema(**schema_kwargs)
+    )
+
+    del kwargs
+    del schema_kwargs
+
+    return param_object
+
+
+def createModuleParameterFromGrassFlag(module_id, key, parameter):
+
+    kwargs = dict()
+    kwargs['default'] = 'False'
+    schema_kwargs = dict()
+    schema_kwargs['type'] = 'boolean'
+
+    key = setParameterKey(module_id, parameter)
+
+    kwargs = setParameterDescription(module_id, key, parameter, kwargs)
+    kwargs = setParameterName(key, kwargs)
+    kwargs = setParameterOptional(parameter, kwargs)
+
+    param_object = ModuleParameter(
+        **kwargs,
+        schema=ModuleParameterSchema(**schema_kwargs)
+    )
+    del kwargs
+    del schema_kwargs
+
+    return param_object
+
+
 def ParseInterfaceDescription(xml_string, keys=None):
     """Parses output of GRASS interface-description
     and returns openEO process object
@@ -174,8 +219,8 @@ def ParseInterfaceDescription(xml_string, keys=None):
     description = gm_dict['description']
     categories = gm_dict['keywords'].replace(' ', '').split(',')
     categories.append('grass-module')
-    parameters = {}
-    returns = {}
+    parameters = []
+    returns = []
     extrakwargs = dict()
 
     try:
@@ -191,70 +236,50 @@ def ParseInterfaceDescription(xml_string, keys=None):
         flags = []
 
     for parameter in grass_params:
-
-        kwargs = dict()
-        schema_kwargs = dict()
-
         if keys:
             # case for actinia modules
             key = setVirtualParameterKey(module_id, parameter)
+            key_exists = False
             if key not in keys:
+                for actiniakey in keys:
+                    if actiniakey.startswith(key):
+                        key_exists = True
+            else:
+                key_exists = True
+            if not key_exists:
                 continue
         else:
             # case for GRASS modules
             key = setParameterKey(module_id, parameter)
-
-        schema_kwargs = setParamType(module_id, key, parameter, schema_kwargs)
-        kwargs = setParameterDescription(module_id, key, parameter, kwargs)
-        kwargs = setParameterRequired(parameter, kwargs)
-        schema_kwargs = setParameterDefault(parameter, schema_kwargs)
-        schema_kwargs = setParameterEnum(parameter, schema_kwargs)
-
-        param_object = ModuleParameter(
-            **kwargs,
-            schema=ModuleParameterSchema(**schema_kwargs)
-        )
+        param_object = createModuleParameterFromGrassParam(
+            module_id, key, parameter)
         if isOutput(parameter):
-            returns[key] = param_object
+            returns.append(param_object)
         else:
-            parameters[key] = param_object
-        del kwargs
-        del schema_kwargs
+            parameters.append(param_object)
 
     for parameter in flags:
         # not possible to specify flag values via template at the moment
         if keys:
             continue
+        param_object = createModuleParameterFromGrassFlag(
+            module_id, key, parameter)
 
-        kwargs = dict()
-        schema_kwargs = dict()
-        schema_kwargs['type'] = 'boolean'
-        schema_kwargs['default'] = 'False'
-
-        key = setParameterKey(module_id, parameter)
-
-        kwargs = setParameterDescription(module_id, key, parameter, kwargs)
-        kwargs = setParameterRequired(parameter, kwargs)
-
-        param_object = ModuleParameter(
-            **kwargs,
-            schema=ModuleParameterSchema(**schema_kwargs)
-        )
-        parameters[key] = param_object
-        del kwargs
-        del schema_kwargs
+        parameters.append(param_object)
 
     # custom extention for importer + exporter from actinia_core
+    # Runs when viewing importer/exporter as module and when used in template.
     try:
         tpl = tplEnv.get_template('gmodules/' + module_id + '.json')
         pc_template = json.loads(tpl.render().replace('\n', ''))
         for key in [*pc_template]:
-            extrakwargs[key] = {}
+            extrakwargs[key] = []
             for param in pc_template[key]:
-                extrakwargs[key][param] = ModuleParameter(**pc_template[key][param])
+                extrakwargs[key].append(ModuleParameter(**param))
     except Exception as e:
         # if no template for module exist, use as is (default)
-        log.debug('template %s does not exist.', e)
+        # log.debug('template %s does not exist.', e)
+        pass
 
     grass_module = Module(
         id=module_id,

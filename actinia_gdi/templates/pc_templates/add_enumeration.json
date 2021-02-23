@@ -1,0 +1,24 @@
+{
+	"id": "add_enumeration",
+	"description": "Example PC to add possible values",
+	"template": {
+		"list": [
+			{
+				"id": "group_input_of_classification",
+				"module": "i.group",
+				"inputs": [
+					{
+						"param": "group",
+						"value": "classificationinput"
+					},
+					{
+						"param": "input",
+						"enum": ["B02","B03","B04","B08","ndvi"],
+						"value": "{{ classificationinput }}"
+					}
+				]
+			}
+		],
+		"version": "1"
+	}
+}
