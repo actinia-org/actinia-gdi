@@ -51,7 +51,7 @@ class ApiTest(unittest.TestCase):
         respStatusCode = 200
 
         # TODO: example actinia-core-response is gone!
-        with open('tests/resources/standalone_app/actinia-core-resp.json') as jsonfile:
+        with open('tests/resources/actinia-core-resp.json') as jsonfile:
             postBody = json.load(jsonfile)
 
         resp = self.app.post('/resources/processes/operations/update',

@@ -76,7 +76,7 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         respStatusCode = 200
 
-        with open('tests/resources/standalone_app/postbody.processes.success.json') as jsonfile:
+        with open('tests/resources/postbody.processes.success.json') as jsonfile:
             postBody = json.load(jsonfile)
 
         resp = self.app.post('/processes/test/jobs',
@@ -92,7 +92,7 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         respStatusCode = 500
 
-        with open('tests/resources/standalone_app/postbody.processes.failure.json') as jsonfile:
+        with open('tests/resources/postbody.processes.failure.json') as jsonfile:
             postBody = json.load(jsonfile)
 
         resp = self.app.post('/processes/test/jobs',
@@ -106,7 +106,7 @@ class ActiniaCoreApiTest(unittest.TestCase):
 class ActiniaCoreCoreTest(unittest.TestCase):
     def test_postActiniaCore(self):
 
-        with open('tests/resources/standalone_app/postbody.processes.success.json') as jsonfile:
+        with open('tests/resources/postbody.processes.success.json') as jsonfile:
             jsonDict = json.load(jsonfile)
 
         process = postActiniaCore('test', jsonDict, 'http://127.0.0.1:5000')
