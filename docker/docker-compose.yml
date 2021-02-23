@@ -2,7 +2,7 @@ version: "3"
 services:
 
   postgis:
-    image: mdillon/postgis:9.6-alpine
+    image: postgis/postgis:12-3.0-alpine
     ports:
       - 5555:5432
     environment:
