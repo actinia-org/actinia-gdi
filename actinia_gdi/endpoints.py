@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 
-Add endpoints to flask app with endpoint definitios and routes
+Add endpoints to flask app with endpoint definitions and routes
 """
 
 __author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
+__copyright__ = "2018-2021 mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
@@ -28,101 +28,26 @@ from flask import current_app, send_from_directory
 import werkzeug
 
 from actinia_gdi.resources.logging import log
+from actinia_gdi.api.resources import Update
 
-from actinia_gdi.api.files import Upload
-from actinia_gdi.api.metadata import GnosConnection
-from actinia_gdi.api.metadata import RawTags
-from actinia_gdi.api.metadata import RawCat
-from actinia_gdi.api.metadata import RawUuid
-from actinia_gdi.api.metadata import Tags
-from actinia_gdi.api.metadata import Uuid
+from actinia_gdi.api.processes.test import ActiniaCoreConnection
+from actinia_gdi.api.processes.test import JobTestWrapper
+from actinia_gdi.api.processes.test import JobHtmlTestWrapper
+from actinia_gdi.api.processes.test import JobIdTestWrapper
 
+from actinia_gdi.api.processes.loop import JobLoopWrapper
+from actinia_gdi.api.processes.loop import JobHtmlLoopWrapper
+from actinia_gdi.api.processes.loop import JobIdLoopWrapper
+from actinia_gdi.api.processes.loop import JobIdCancelLoopWrapper
 
-# endpoints loaded if run as actinia-core plugin
-def create_endpoints(flask_api):
-
-    # import all classes that are only needed in plugin mode
-    from actinia_gdi.api.gmodules.grass import ListModules
-    from actinia_gdi.api.gmodules.grass import DescribeModule
-    from actinia_gdi.api.gmodules.actinia import ListProcessChainTemplates
-    from actinia_gdi.api.gmodules.actinia import DescribeProcessChainTemplate
-    from actinia_gdi.api.gmodules.combined import ListVirtualModules
-    from actinia_gdi.api.gmodules.combined import DescribeVirtualModule
-
-    from actinia_gdi.api.gdi_processing import \
-        GdiAsyncEphemeralExportResource, GdiAsyncPersistentResource
-
-    app = flask_api.app
-    apidoc = flask_api
-
-    @app.route('/')
-    def index():
-        try:
-            return current_app.send_static_file('index.html')
-        except werkzeug.exceptions.NotFound:
-            log.debug('No index.html found in static folder. Serving backup.')
-            # when actinia-gdi is installed in single mode, the swagger
-            # endpoint would be "latest/api/swagger.json". As api docs exist in
-            # single mode, use this fallback for plugin mode.
-            return ("""<h1 style='color:red'>actinia GDI</h1>
-                <a href="api/v1/swagger.json">API docs</a>""")
-
-    @app.route('/<path:filename>')
-    def static_content(filename):
-        # WARNING: all content from folder "static" will be accessible!
-        return send_from_directory(app.static_folder, filename)
-
-    apidoc.add_resource(Upload, '/files')
-
-    apidoc.add_resource(GnosConnection, '/metadata/test/connection')
-
-    apidoc.add_resource(RawTags, '/metadata/raw/tags/<tags>')
-    apidoc.add_resource(RawCat, '/metadata/raw/categories/<category>')
-    apidoc.add_resource(RawUuid, '/metadata/raw/uuids/<uuid>')
-    apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
-    apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
-
-    apidoc.add_resource(ListModules, '/grassmodules')
-    apidoc.add_resource(DescribeModule, '/grassmodules/<grassmodule>')
-
-    apidoc.add_resource(ListProcessChainTemplates, '/actiniamodules')
-    apidoc.add_resource(DescribeProcessChainTemplate,
-                        '/actiniamodules/<actiniamodule>')
-
-    apidoc.add_resource(ListVirtualModules, '/modules')
-    apidoc.add_resource(DescribeVirtualModule, '/modules/<module>')
-
-    apidoc.add_resource(
-        GdiAsyncEphemeralExportResource,
-        '/locations/<string:location_name>/gdi_processing_async_export'
-    )
-
-    apidoc.add_resource(
-        GdiAsyncPersistentResource,
-        '/locations/<string:location_name>/mapsets/<string:mapset_name>/gdi_processing_async'
-    )
+from actinia_gdi.api.processes.sentinel1 import JobS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobHtmlS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobIdS1Wrapper
+from actinia_gdi.api.processes.sentinel1 import JobIdCancelS1Wrapper
 
 
 # endpoints loaded if run as standalone app
 def addEndpoints(app, apidoc):
-
-    # import all classes that are only needed for standalone run
-    from actinia_gdi.api.processes.test import ActiniaCoreConnection
-    from actinia_gdi.api.processes.test import JobTestWrapper
-    from actinia_gdi.api.processes.test import JobHtmlTestWrapper
-    from actinia_gdi.api.processes.test import JobIdTestWrapper
-
-    from actinia_gdi.api.processes.loop import JobLoopWrapper
-    from actinia_gdi.api.processes.loop import JobHtmlLoopWrapper
-    from actinia_gdi.api.processes.loop import JobIdLoopWrapper
-    from actinia_gdi.api.processes.loop import JobIdCancelLoopWrapper
-
-    from actinia_gdi.api.processes.sentinel1 import JobS1Wrapper
-    from actinia_gdi.api.processes.sentinel1 import JobHtmlS1Wrapper
-    from actinia_gdi.api.processes.sentinel1 import JobIdS1Wrapper
-    from actinia_gdi.api.processes.sentinel1 import JobIdCancelS1Wrapper
-
-    from actinia_gdi.api.resources import Update
 
     @app.route('/')
     def index():
@@ -137,16 +62,6 @@ def addEndpoints(app, apidoc):
     def static_content(filename):
         # WARNING: all content from folder "static" will be accessible!
         return send_from_directory(app.static_folder, filename)
-
-    apidoc.add_resource(Upload, '/files')
-
-    apidoc.add_resource(GnosConnection, '/metadata/test/connection')
-
-    apidoc.add_resource(RawTags, '/metadata/raw/tags/<tags>')
-    apidoc.add_resource(RawCat, '/metadata/raw/categories/<category>')
-    apidoc.add_resource(RawUuid, '/metadata/raw/uuids/<uuid>')
-    apidoc.add_resource(Tags, '/metadata/geodata/tags/<tags>')
-    apidoc.add_resource(Uuid, '/metadata/geodata/uuids/<uuid>')
 
     # ##### TEST actiniaCore
     # GET / POST

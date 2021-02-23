@@ -1,9 +1,0 @@
-{
-  "request": "GetRecords",
-  "service": "CSW",
-  "version": "2.0.2",
-  "typeNames": "csw:Record",
-  "resultType": "results",
-  "elementSetName": "full",
-  "outputSchema": "http://www.isotc211.org/2005/gmd"
-}
