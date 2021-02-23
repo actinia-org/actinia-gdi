@@ -3,7 +3,7 @@
 # defined in setup.py.
 
 colorlog>=3.1.4
-Flask>=0.12.3
+Flask
 Flask-Cors>=3.0.3
 Flask-RESTful>=0.3.6
 flask-restful-swagger-2>=0.35
@@ -13,8 +13,9 @@ peewee>=3.2.2
 psycopg2-binary>=2.7.4
 pyscaffold
 pytest-cov>=2.5.1
+python-json-logger
 requests>=2.20.0
-setuptools
+setuptools>=30.3.0
 xmltodict>=0.11.0
 
 # pyscaffold needed for s2i build

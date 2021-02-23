@@ -75,6 +75,7 @@ class LOGCONFIG:
     """
     logfile = 'actinia-gdi.log'
     level = 'DEBUG'
+    type = 'stdout'
 
 
 class ACTINIACORE:
@@ -198,6 +199,8 @@ class Configfile:
                 LOGCONFIG.logfile = config.get("LOGCONFIG", "logfile")
             if config.has_option("LOGCONFIG", "level"):
                 LOGCONFIG.level = config.get("LOGCONFIG", "level")
+            if config.has_option("LOGCONFIG", "type"):
+                LOGCONFIG.type = config.get("LOGCONFIG", "type")
 
         # ACTINIACORE
         if config.has_section("ACTINIACORE"):
