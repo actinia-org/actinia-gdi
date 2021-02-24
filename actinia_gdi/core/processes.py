@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,17 +20,16 @@ Module to start a process
 """
 
 __author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
+__copyright__ = "2018-2021 mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
 import json
 
+# from actinia_gdi.core.gnosWriter import update
+
 from actinia_gdi.api.common import checkConnectionWithoutResponse
 from actinia_gdi.resources.logging import log
-from actinia_gdi.core.gnosReader import getMetaByUUID, getMetaByTags
-from actinia_gdi.core.gnosReader import getRecordByUUID
-from actinia_gdi.core.gnosWriter import update
 from actinia_gdi.core.jobtable import insertNewJob, getJobById
 from actinia_gdi.core.jobtable import getAllIds, getAllJobs, cancelJobById
 from actinia_gdi.core.actiniaCore import postActiniaCore, cancelActiniaCore
@@ -141,13 +140,13 @@ def updateJob(resourceId, actiniaCoreResp):
     # TODO: for now if multiple records need to be updated, this
     # can be told by specifying multiple uuids comma-separated in the
     # "feature_uuid" field of the preprocesschain. This might change later...
-    if status == 'finished':
-        try:
-            uuids = uuid.split(',')
-            for uuid in uuids:
-                update(uuid, utcnow)
-        except Exception:
-            log.warning('Could not update geonetwork record')
+    # if status == 'finished':
+    #     try:
+    #         uuids = uuid.split(',')
+    #         for uuid in uuids:
+    #             update(uuid, utcnow)
+    #     except Exception:
+    #         log.warning('Could not update geonetwork record')
 
     return job
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ Learn more under: http://pyscaffold.org/
 """
 
 __author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
-__license__ = "TODO"
+__copyright__ = "2018-2021 mundialis GmbH & Co. KG"
+__license__ = "Apache-2.0"
 
 
 from setuptools import setup
@@ -33,9 +33,9 @@ from setuptools import setup
 entry_points = {
     'console_scripts': [
         'name = actinia_gdi.resources.cli:name',
-    'about = actinia_gdi.resources.cli:about',
-    'pc2grass = actinia_gdi.resources.cli:pc2grass'
-  ]
+        'about = actinia_gdi.resources.cli:about',
+        'pc2grass = actinia_gdi.resources.cli:pc2grass'
+    ]
 }
 
 

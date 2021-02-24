@@ -95,4 +95,4 @@ class swaggerTest(unittest.TestCase):
 
         assert type(resp) is Response
         assert type(respData) == dict
-        assert respData["info"]["title"] == 'actinia GDI'
+        assert respData["info"]["title"] == 'actinia-gdi'

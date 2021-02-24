@@ -6,7 +6,7 @@
 *.orig
 *.log
 *.pot
-__pycache__/*
+__pycache__
 .cache/*
 .*.swp
 */.ipynb_checkpoints/*
@@ -30,10 +30,11 @@ htmlcov/*
 .tox
 junit.xml
 coverage.xml
+.pytest_cache
 
 # Build and docs folder/files
-build/*
-dist/*
+build
+dist
 sdist/*
 docs/api/*
 docs/_build/*
@@ -43,12 +44,6 @@ MANIFEST
 # Development env
 dev
 venv/
-showcase
 config/mount/config.ini
 config/mount/pw.ini
 config/actinia-gdi.cfg
-docker/redis_data/dump.rdb
-docker/actinia-core-data/grassdb
-docker/actinia-core-data/resources
-docker/actinia-core-data/userdata
-docker/actinia-core-data/workspace

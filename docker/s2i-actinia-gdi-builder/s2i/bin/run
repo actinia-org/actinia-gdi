@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# copied from https://github.com/sclorg/s2i-python-container/blob/master/3.5/s2i/bin/run to overwrite port
+# copied from https://github.com/sclorg/s2i-python-container/blob/master/3.8/s2i/bin/run to overwrite port
 
 source /opt/app-root/etc/generate_container_user
 
@@ -38,6 +38,19 @@ function get_default_web_concurrency() {
   echo $default
 }
 
+function maybe_run_in_init_wrapper() {
+  if [[ -z "$ENABLE_INIT_WRAPPER" ]]; then
+    exec "$@"
+  else
+    exec $STI_SCRIPTS_PATH/init-wrapper "$@"
+  fi
+}
+
+APP_HOME=$(readlink -f "${APP_HOME:-.}")
+# Change the working directory to APP_HOME
+PYTHONPATH="$(pwd)${PYTHONPATH:+:$PYTHONPATH}"
+cd "$APP_HOME"
+
 app_script_check="${APP_SCRIPT-}"
 APP_SCRIPT="${APP_SCRIPT-app.sh}"
 if [[ -f "$APP_SCRIPT" ]]; then
@@ -45,7 +58,7 @@ if [[ -f "$APP_SCRIPT" ]]; then
   if [[ "$APP_SCRIPT" != /* ]]; then
     APP_SCRIPT="./$APP_SCRIPT"
   fi
-  exec "$APP_SCRIPT"
+  maybe_run_in_init_wrapper "$APP_SCRIPT"
 else
   test -n "$app_script_check" && (>&2 echo "ERROR: file '$app_script_check' not found.") && exit 1
 fi
@@ -54,14 +67,13 @@ app_file_check="${APP_FILE-}"
 APP_FILE="${APP_FILE-app.py}"
 if [[ -f "$APP_FILE" ]]; then
   echo "---> Running application from Python script ($APP_FILE) ..."
-  exec python "$APP_FILE"
+  maybe_run_in_init_wrapper python "$APP_FILE"
 else
   test -n "$app_file_check" && (>&2 echo "ERROR: file '$app_file_check' not found.") && exit 1
 fi
 
-APP_HOME=${APP_HOME:-.}
-# Look for 'manage.py' in the directory specified by APP_HOME, or the current direcotry
-manage_file=$APP_HOME/manage.py
+# Look for 'manage.py' in the current directory
+manage_file=./manage.py
 
 if should_migrate; then
   if [[ -f "$manage_file" ]]; then
@@ -74,14 +86,12 @@ if should_migrate; then
 fi
 
 if is_gunicorn_installed; then
-  if [[ -z "$APP_MODULE" ]]; then
-    # Look only in the directory specified by APP_HOME, or the current directory
-    # replace all "/" with ".", remove leading "." and ".py" suffix
-    APP_MODULE=$(find $APP_HOME -maxdepth 1 -type f -name 'wsgi.py' | sed 's:/:.:g;s:^\.\+::;s:\.py$::')
-  fi
-
-  if [[ -z "$APP_MODULE" && -f setup.py ]]; then
-    APP_MODULE="$(python setup.py --name)"
+  setup_py=$(find "$HOME" -maxdepth 2 -type f -name 'setup.py' -print -quit)
+  # Look for wsgi module in the current directory
+  if [[ -z "$APP_MODULE" && -f "./wsgi.py" ]]; then
+    APP_MODULE=wsgi
+  elif [[ -z "$APP_MODULE" && -f "$setup_py" ]]; then
+    APP_MODULE="$(python "$setup_py" --name)"
   fi
 
   if [[ "$APP_MODULE" ]]; then
@@ -90,6 +100,7 @@ if is_gunicorn_installed; then
     echo "---> Serving application with gunicorn ($APP_MODULE) ..."
     # exec gunicorn "$APP_MODULE" --bind=0.0.0.0:8080 --access-logfile=- --config "$APP_CONFIG"
     exec gunicorn "$APP_MODULE" --access-logfile=- --config "$APP_CONFIG"
+
   fi
 fi
 
@@ -98,7 +109,7 @@ if is_django_installed; then
     echo "---> Serving application with 'manage.py runserver' ..."
     echo "WARNING: this is NOT a recommended way to run you application in production!"
     echo "Consider using gunicorn or some other production web server."
-    exec python "$manage_file" runserver 0.0.0.0:8080
+    maybe_run_in_init_wrapper python "$manage_file" runserver 0.0.0.0:8080
   else
     echo "WARNING: seems that you're using Django, but we could not find a 'manage.py' file."
     echo "Skipped 'python manage.py runserver'."
