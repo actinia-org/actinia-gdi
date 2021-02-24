@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ Configuration file
 """
 
 __author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
+__copyright__ = "2018-2021 mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
@@ -56,20 +56,6 @@ class JOBTABLE:
     id_field = 'idpk_jobs'
 
 
-class GEONETWORK:
-    """Default config for connection to geonetwork
-    """
-    scheme = 'http'
-    host = 'localhost'
-    port = '1234'
-    base_path = '/geonetwork'
-    csw_path = '/srv/eng/csw'
-    csw_publication = '/srv/eng/csw-publication'
-    user = 'test'
-    password = 'test'
-    csw_url = scheme + '://' + host + ':' + port + base_path + csw_path
-
-
 class LOGCONFIG:
     """Default config for logging
     """
@@ -96,11 +82,6 @@ class GISTABLE:
     port = '5432'
     database = 'gis'
     user = 'gis'
-
-
-class FILEUPLOAD:
-    geodata = '/tmp/'
-    templates = '/tmp/'
 
 
 class Configfile:
@@ -150,49 +131,6 @@ class Configfile:
             if config.has_option("JOBTABLE", "id_field"):
                 JOBTABLE.id_field = config.get("JOBTABLE", "id_field")
 
-        # GEONETWORK
-        if config.has_section("GEONETWORK"):
-            if config.has_option("GEONETWORK", "scheme"):
-                GEONETWORK.scheme = config.get("GEONETWORK", "scheme")
-            if config.has_option("GEONETWORK", "host"):
-                GEONETWORK.host = config.get("GEONETWORK", "host")
-            if config.has_option("GEONETWORK", "port"):
-                GEONETWORK.port = config.get("GEONETWORK", "port")
-            if config.has_option("GEONETWORK", "base_path"):
-                GEONETWORK.base_path = config.get("GEONETWORK", "base_path")
-            if config.has_option("GEONETWORK", "csw_path"):
-                GEONETWORK.csw_path = config.get("GEONETWORK", "csw_path")
-            if config.has_option("GEONETWORK", "csw_create_path"):
-                GEONETWORK.csw_create_path = config.get("GEONETWORK", "csw_create_path")
-            if config.has_option("GEONETWORK", "user"):
-                GEONETWORK.user = config.get("GEONETWORK", "user")
-            if config.has_option("GEONETWORK", "password"):
-                GEONETWORK.password = config.get("GEONETWORK", "password")
-
-            if (config.has_option("GEONETWORK", "scheme") and
-                    config.has_option("GEONETWORK", "host") and
-                    config.has_option("GEONETWORK", "port") and
-                    config.has_option("GEONETWORK", "base_path") and
-                    config.has_option("GEONETWORK", "csw_path")):
-
-                GEONETWORK.csw_url = (GEONETWORK.scheme + '://' +
-                                      GEONETWORK.host + ':' +
-                                      GEONETWORK.port +
-                                      GEONETWORK.base_path +
-                                      GEONETWORK.csw_path)
-
-            if (config.has_option("GEONETWORK", "scheme") and
-                    config.has_option("GEONETWORK", "host") and
-                    config.has_option("GEONETWORK", "port") and
-                    config.has_option("GEONETWORK", "base_path") and
-                    config.has_option("GEONETWORK", "csw_publication")):
-
-                GEONETWORK.csw_publication = (GEONETWORK.scheme + '://' +
-                                              GEONETWORK.host + ':' +
-                                              GEONETWORK.port +
-                                              GEONETWORK.base_path +
-                                              GEONETWORK.csw_publication)
-
         # LOGGING
         if config.has_section("LOGCONFIG"):
             if config.has_option("LOGCONFIG", "logfile"):
@@ -227,13 +165,6 @@ class Configfile:
                 GISTABLE.database = config.get("GISTABLE", "database")
             if config.has_option("GISTABLE", "user"):
                 GISTABLE.user = config.get("GISTABLE", "user")
-
-        # FILEUPLOAD
-        if config.has_section("FILEUPLOAD"):
-            if config.has_option("FILEUPLOAD", "geodata"):
-                FILEUPLOAD.geodata = config.get("FILEUPLOAD", "geodata")
-            if config.has_option("FILEUPLOAD", "templates"):
-                FILEUPLOAD.templates = config.get("FILEUPLOAD", "templates")
 
 
 init = Configfile()

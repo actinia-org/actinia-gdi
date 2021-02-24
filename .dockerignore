@@ -1,5 +1,4 @@
 docker
-!docker/actinia-core/actinia.cfg
 !docker/release/create_release_with_asset.sh
 .gitignore
 .github

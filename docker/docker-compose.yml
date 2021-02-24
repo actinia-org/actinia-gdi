@@ -4,7 +4,7 @@ services:
   postgis:
     image: postgis/postgis:12-3.0-alpine
     ports:
-      - 5555:5432
+      - "5555:5432"
     environment:
       POSTGRES_USER: actinia
       POSTGRES_PASSWORD: actinia
@@ -15,9 +15,7 @@ services:
   actinia-gdi:
     image: actinia-gdi
     ports:
-      - 5000:5000
-    expose:
-      - 5000
+      - "5000:5000"
     depends_on:
       - postgis
     volumes:

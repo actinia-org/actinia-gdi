@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Copyright (c) 2018-present mundialis GmbH & Co. KG
+Copyright (c) 2018-2021 mundialis GmbH & Co. KG
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ Module for shared methods
 """
 
 __author__ = "Carmen Tawalika"
-__copyright__ = "2018-present mundialis GmbH & Co. KG"
+__copyright__ = "2018-2021 mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
 import json
 
 import requests
-import xmltodict
 from requests.auth import HTTPBasicAuth
 
 from actinia_gdi.resources.logging import log
@@ -66,10 +65,7 @@ def checkConnection(url, name, expectedFormat):
         return None
 
     try:
-        if expectedFormat == 'xml':
-            parsedresp = xmltodict.parse(resp.content)
-            records = json.dumps(parsedresp)
-        elif expectedFormat == 'json':
+        if expectedFormat == 'json':
             parsedresp = json.loads(resp.text)
 
         log.debug('Connection successfull to ' + name)
@@ -78,18 +74,3 @@ def checkConnection(url, name, expectedFormat):
     except Exception:
         log.error('Connection Error to ' + name)
         return None
-
-
-def start_job(timeout, func, *args):
-    """Execute the provided function in a subprocess
-    Args:
-        func: The function to call from the subprocess
-        *args: The function arguments
-    Returns:
-    """
-    # Just starting the process
-    from multiprocessing import Process
-    p = Process(target=func, args=args)
-    p.start()
-
-    return
