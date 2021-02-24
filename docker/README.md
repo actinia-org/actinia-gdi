@@ -34,6 +34,7 @@ docker-compose --file docker/docker-compose.yml run --rm \
 __Inside the container, run the actinia-gdi server with mounted source code:__
 ```
 python3 setup.py install
+python3 setup.py test
 
 # python3 -m actinia_gdi.main
 gunicorn -b 0.0.0.0:5000 -w 1 --access-logfile=- -k gthread actinia_gdi.wsgi
@@ -104,4 +105,25 @@ gunicorn -b :5000 -w 1 --access-logfile=- -k gthread actinia_gdi.wsgi
 If all done, leave environment
 ```
 deactivate
+```
+
+## Create API docs
+```
+wget -O /tmp/actinia-gdi.json http://127.0.0.1:5000/latest/api/swagger.json
+```
+Run spectacle docker image to generate the HTML documentation
+```
+docker run -v /tmp:/tmp -t sourcey/spectacle \
+  spectacle -1 /tmp/actinia-gdi.json -t /tmp
+
+# or if you have spectacle installed (npm install -g spectacle-docs), run
+cd actinia_gdi/static
+spectacle /tmp/actinia-gdi.json -t .
+
+# to build all in one file:
+spectacle -1 /tmp/actinia-gdi.json -t .
+```
+beautify css
+```
+sed -i 's+<link rel="stylesheet" href="stylesheets/spectacle.min.css" />+<link rel="stylesheet" href="stylesheets/spectacle.min.css" />\n    <link rel="stylesheet" href="stylesheets/actinia.css" />+g' index.html
 ```

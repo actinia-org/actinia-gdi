@@ -7,16 +7,6 @@ For installation or DEV setup, see docker/README.md.
 
 ## DEV notes:
 
-### Build
-
-__insprired by https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/__
-
-to create a shippable wheel, run
-```
-pip3 install --upgrade pip pep517
-python3 -m pep517.build .
-```
-
 #### Versioning:
 
 https://semver.org/ (MAJOR.MINOR.PATCH)
