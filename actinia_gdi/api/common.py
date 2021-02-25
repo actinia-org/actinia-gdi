@@ -54,10 +54,12 @@ def checkConnection(name):
         log.error("Don't know which connection to test")
 
     if records is not None:
-        res = jsonify(SimpleStatusCodeResponseModel(status=200, message="success"))
+        res = jsonify(SimpleStatusCodeResponseModel(
+            status=200, message="success"))
         return make_response(res, 200)
     elif records is None:
-        res = jsonify(SimpleStatusCodeResponseModel(status=404, message="failure"))
+        res = jsonify(SimpleStatusCodeResponseModel(
+            status=404, message="failure"))
         return make_response(res, 200)
 
 

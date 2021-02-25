@@ -73,7 +73,7 @@ def createJob(jsonDict, process):
             jsonDict,
             jsonDict,  # as we don't hava a model yet
             process,
-            jsonDict.get('feature_type'),  # empty at the moment (polygon later)
+            jsonDict.get('feature_type'),  # currently empty (polygon later)
             actiniaCoreResp
         )
 
@@ -100,15 +100,15 @@ def getJob(jobid):
 
 
 def getAllJobIDs():
-        """ Method to read all job ids from Jobtable
+    """ Method to read all job ids from Jobtable
 
-        This method can be called by HTTP GET
+    This method can be called by HTTP GET
     @app.route('/processes/test/jobs.html')
-        """
+    """
 
-        job = getAllIds()
+    job = getAllIds()
 
-        return job
+    return job
 
 
 def getJobs(filters, process):
@@ -158,7 +158,7 @@ def cancelJob(jobid):
     @app.route('/processes/test/jobs/<jobid>/operations/cancel')
     """
     job = getJobById(jobid)
-    if not job == None:
+    if job is not None:
         log.debug('The job with jobid ' + str(jobid) + ' exists')
         status = job['status']
         resourceId = job['actinia_core_jobid']
@@ -166,7 +166,8 @@ def cancelJob(jobid):
             log.error('Job status or resourceId is not set!')
             return None
         else:
-            log.debug('Job status is ' + status + ' and resourceId is: ' + resourceId)
+            log.debug('Job status is %s and resourceId is %s'
+                      % (status, resourceId))
 
         connection = checkConnectionWithoutResponse('actinia-core')
         if connection is not None:

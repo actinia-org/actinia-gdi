@@ -24,10 +24,11 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
-from flask_restful_swagger_2 import swagger
+# from flask_restful_swagger_2 import swagger
 
 # from actinia_gdi.apidocs.processes import loop  # TODO
-from actinia_gdi.api.processes.processes import Job, JobHtml, JobId, JobIdCancel
+from actinia_gdi.api.processes.processes import Job, JobHtml, JobId
+from actinia_gdi.api.processes.processes import JobIdCancel
 
 
 class JobHtmlLoopWrapper(JobHtml):

@@ -147,13 +147,16 @@ class Configfile:
             if config.has_option("ACTINIACORE", "user"):
                 ACTINIACORE.user = config.get("ACTINIACORE", "user")
             if config.has_option("ACTINIACORE", "filestorage"):
-                ACTINIACORE.filestorage = config.get("ACTINIACORE", "filestorage")
+                ACTINIACORE.filestorage = config.get(
+                    "ACTINIACORE", "filestorage")
             if config.has_option("ACTINIACORE", "password"):
                 ACTINIACORE.password = config.get("ACTINIACORE", "password")
             if config.has_option("ACTINIACORE", "esa_apihub_user"):
-                ACTINIACORE.esa_apihub_user = config.get("ACTINIACORE", "esa_apihub_user")
+                ACTINIACORE.esa_apihub_user = config.get(
+                    "ACTINIACORE", "esa_apihub_user")
             if config.has_option("ACTINIACORE", "esa_apihub_pw"):
-                ACTINIACORE.esa_apihub_pw = config.get("ACTINIACORE", "esa_apihub_pw")
+                ACTINIACORE.esa_apihub_pw = config.get(
+                    "ACTINIACORE", "esa_apihub_pw")
 
         # GISTABLE
         if config.has_section("GISTABLE"):

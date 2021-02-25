@@ -87,7 +87,8 @@ def insertNewJob(
     if current_app.debug is False:
         smallRes = dict()
         smallRes['message'] = actiniaCoreResp.get('message', None)
-        smallRes['process_results'] = actiniaCoreResp.get('process_results', None)
+        smallRes['process_results'] = actiniaCoreResp.get(
+            'process_results', None)
         actiniaCoreResp = smallRes
 
         # actiniaCoreResp = smallifyResp(actiniaCoreResp)
