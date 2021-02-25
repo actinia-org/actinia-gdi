@@ -46,9 +46,10 @@ gunicornLog = logging.getLogger('gunicorn')
 def setLogFormat(veto=None):
     logformat = ""
     if LOGCONFIG.type == 'json' and not veto:
-        logformat = CustomJsonFormatter('%(time) %(level) %(component) %(module)'
-                                        '%(message) %(pathname) %(lineno)'
-                                        '%(processName) %(threadName)')
+        logformat = CustomJsonFormatter('%(time) %(level) %(component)'
+                                        '%(module) %(message) %(pathname)'
+                                        '%(lineno) %(processName)'
+                                        '%(threadName)')
     else:
         logformat = ColoredFormatter(
             '%(log_color)s[%(asctime)s] %(levelname)-10s: %(name)s.%(module)-'
@@ -69,7 +70,8 @@ def setLogHandler(logger, type, format):
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
+        super(CustomJsonFormatter, self).add_fields(
+            log_record, record, message_dict)
 
         # (Pdb) dir(record)
         # ... 'args', 'created', 'exc_info', 'exc_text', 'filename', 'funcName'

@@ -24,7 +24,7 @@ __copyright__ = "2018-present mundialis GmbH & Co. KG"
 __license__ = "Apache-2.0"
 
 
-from peewee import PostgresqlDatabase, Model
+from peewee import Model
 from peewee import CharField, DateTimeField, AutoField
 from playhouse.postgres_ext import BinaryJSONField
 from playhouse.pool import PooledPostgresqlExtDatabase
@@ -33,10 +33,9 @@ from actinia_gdi.resources.config import JOBTABLE
 from actinia_gdi.resources.logging import log
 
 
-log.debug("Database config loaded: " + JOBTABLE.host + ":" + JOBTABLE.port +
-          "/" + JOBTABLE.database + "/" +
-          JOBTABLE.schema + "." + JOBTABLE.table)
-
+log.debug("Database config loaded: %s:%s/%s/%s.%s" % (
+    JOBTABLE.host, JOBTABLE.port, JOBTABLE.database,
+    JOBTABLE.schema, JOBTABLE.table))
 
 """database connection"""
 jobdb = PooledPostgresqlExtDatabase(

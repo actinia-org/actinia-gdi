@@ -28,7 +28,7 @@ import json
 
 from flask import make_response, jsonify, request
 from flask_restful import Resource
-from flask_restful_swagger_2 import swagger
+# from flask_restful_swagger_2 import swagger
 
 # from actinia_gdi.apidocs.processes import test
 from actinia_gdi.api.common import checkConnection
@@ -94,7 +94,8 @@ class JobTestWrapper(Job):
                 res.headers['Content-Type'] = 'application/json'
                 return res
         except Exception:
-            res = jsonify(SimpleStatusCodeResponseModel(status=500, message="failure"))
+            res = jsonify(SimpleStatusCodeResponseModel(
+                status=500, message="failure"))
             return make_response(res, 500)
 
 

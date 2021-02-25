@@ -25,7 +25,6 @@ __license__ = "Apache-2.0"
 
 
 import unittest
-import pytest
 import json
 from flask import Response
 
@@ -76,8 +75,8 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         respStatusCode = 200
 
-        with open('tests/resources/postbody.processes.success.json') as jsonfile:
-            postBody = json.load(jsonfile)
+        with open('tests/resources/postbody.processes.success.json') as file:
+            postBody = json.load(file)
 
         resp = self.app.post('/processes/test/jobs',
                              data=json.dumps(postBody),
@@ -92,8 +91,8 @@ class ActiniaCoreApiTest(unittest.TestCase):
 
         respStatusCode = 500
 
-        with open('tests/resources/postbody.processes.failure.json') as jsonfile:
-            postBody = json.load(jsonfile)
+        with open('tests/resources/postbody.processes.failure.json') as file:
+            postBody = json.load(file)
 
         resp = self.app.post('/processes/test/jobs',
                              data=json.dumps(postBody),
@@ -106,8 +105,8 @@ class ActiniaCoreApiTest(unittest.TestCase):
 class ActiniaCoreCoreTest(unittest.TestCase):
     def test_postActiniaCore(self):
 
-        with open('tests/resources/postbody.processes.success.json') as jsonfile:
-            jsonDict = json.load(jsonfile)
+        with open('tests/resources/postbody.processes.success.json') as file:
+            jsonDict = json.load(file)
 
         process = postActiniaCore('test', jsonDict, 'http://127.0.0.1:5000')
 

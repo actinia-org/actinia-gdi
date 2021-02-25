@@ -26,7 +26,7 @@ __license__ = "Apache-2.0"
 
 from flask import make_response, jsonify, request, render_template
 from flask_restful import Resource
-from flask_restful_swagger_2 import swagger
+# from flask_restful_swagger_2 import swagger
 
 # from actinia_gdi.apidocs.processes import processes
 from actinia_gdi.model.responseModels import SimpleStatusCodeResponseModel
