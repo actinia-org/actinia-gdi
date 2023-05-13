@@ -2,7 +2,7 @@ version: "3"
 services:
 
   postgis:
-    image: postgis/postgis:12-3.0-alpine
+    image: postgis/postgis:13-3.0-alpine
     ports:
       - "5555:5432"
     environment:
